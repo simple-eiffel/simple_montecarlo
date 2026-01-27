@@ -1,10 +1,19 @@
-# simple_montecarlo
+<p align="center">
+  <img src="docs/images/logo.png" alt="simple_montecarlo logo" width="200">
+</p>
 
-[Documentation](https://simple-eiffel.github.io/simple_montecarlo/) • [GitHub](https://github.com/simple-eiffel/simple_montecarlo) • [Issues](https://github.com/simple-eiffel/simple_montecarlo/issues)
+<h1 align="center">simple_montecarlo</h1>
 
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![Eiffel 25.02](https://img.shields.io/badge/Eiffel-25.02-purple.svg)
-![DBC: Contracts](https://img.shields.io/badge/DBC-Contracts-green.svg)
+<p align="center">
+  <a href="https://simple-eiffel.github.io/simple_montecarlo/">Documentation</a> •
+  <a href="https://github.com/simple-eiffel/simple_montecarlo">GitHub</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
+  <img src="https://img.shields.io/badge/Eiffel-25.02-purple.svg" alt="Eiffel 25.02">
+  <img src="https://img.shields.io/badge/DBC-Contracts-green.svg" alt="Design by Contract">
+</p>
 
 Type-safe Monte Carlo simulation framework for Eiffel engineers.
 
@@ -16,6 +25,12 @@ Part of the [Simple Eiffel](https://github.com/simple-eiffel) ecosystem.
 - 25 tests passing, 100% pass rate
 - Type-safe measurements, flexible trial logic, comprehensive statistics
 - Design by Contract throughout
+
+## Overview
+
+**simple_montecarlo** is a production-ready Monte Carlo simulation framework for Eiffel that makes stochastic experiments accessible to engineers without deep statistical expertise.
+
+It offers **type-safe measurements**, **flexible trial logic**, and **comprehensive statistics** including mean, standard deviation, and confidence intervals.
 
 ## Quick Start
 
@@ -35,32 +50,32 @@ do
 end
 ```
 
-For complete documentation, see [our docs site](https://simple-eiffel.github.io/simple_montecarlo/).
-
 ## Features
 
-- Type-safe measurements (prevent confusion with probabilities)
-- Flexible trial logic via agents (closures)
-- Comprehensive statistics (mean, std_dev, min/max, confidence intervals)
-- Design by Contract throughout
-- Void-safe implementation
-- SCOOP compatible
-
-For detailed information, see the [User Guide](https://simple-eiffel.github.io/simple_montecarlo/user-guide.html).
+- **Type-Safe Measurements** - Prevent confusion between values and probabilities
+- **Flexible Trial Logic** - Define trial behavior via agents (closures)
+- **Outcome Collection** - Gather results from each trial automatically
+- **Statistics Aggregation** - Compute mean, std_dev, min/max, CIs automatically
+- **Design by Contract** - Full preconditions, postconditions, invariants
+- **Void-Safe** - void_safety="all" prevents null pointer errors
+- **SCOOP Compatible** - Ready for concurrent execution (future)
 
 ## Installation
 
-```bash
-# Add to your ECF:
+1. Set the ecosystem environment variable (one-time setup for all simple_* libraries):
+```
+SIMPLE_EIFFEL=D:\prod
+```
+
+2. Add to ECF:
+```xml
 <library name="simple_montecarlo" location="$SIMPLE_EIFFEL/simple_montecarlo/simple_montecarlo.ecf"/>
 ```
 
 ## License
 
-MIT License - See LICENSE file
+MIT License - see [LICENSE](LICENSE) file.
 
-## Support
+---
 
-- **Docs:** https://simple-eiffel.github.io/simple_montecarlo/
-- **GitHub:** https://github.com/simple-eiffel/simple_montecarlo
-- **Issues:** https://github.com/simple-eiffel/simple_montecarlo/issues
+Part of the [Simple Eiffel](https://github.com/simple-eiffel) ecosystem.
