@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simple_montecarlo - Monte Carlo simulation framework for Eiffel</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <svg class="logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="100" r="95" fill="#667eea" stroke="#fff" stroke-width="2"/>
+                <text x="100" y="120" font-size="60" font-weight="bold" text-anchor="middle" fill="#fff">MC</text>
+            </svg>
+        </div>
+        <h1>simple_montecarlo</h1>
+        <p class="tagline">Type-safe Monte Carlo simulation framework for Eiffel</p>
+        <div class="badges">
+            <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License">
+            <img src="https://img.shields.io/badge/Eiffel-25.02-purple.svg" alt="Eiffel 25.02">
+            <img src="https://img.shields.io/badge/DBC-Contracts-green.svg" alt="Design by Contract">
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="quick.html">QUICK API</a></li>
+            <li><a href="user-guide.html">User Guide</a></li>
+            <li><a href="api-reference.html">API Reference</a></li>
+            <li><a href="architecture.html">Architecture</a></li>
+            <li><a href="cookbook.html">Cookbook</a></li>
+            <li><a href="https://github.com/simple-eiffel/simple_montecarlo">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+                <strong>simple_montecarlo</strong> is a production-ready Monte Carlo simulation framework for Eiffel
+                that makes stochastic experiments accessible to engineers without deep statistical expertise.
+            </p>
+            <p>
+                It offers <strong>type-safe measurements</strong>, <strong>flexible trial logic</strong>, and
+                <strong>comprehensive statistics</strong> including mean, standard deviation, and confidence intervals.
+            </p>
+            <p>
+                Part of the <a href="https://github.com/simple-eiffel">Simple Eiffel</a> ecosystem.
+            </p>
+        </section>
+
+        <section id="use-cases">
+            <h2>Use Cases</h2>
+            <ul>
+                <li><strong>Manufacturing:</strong> Measure tolerances and compute 95% confidence intervals</li>
+                <li><strong>Automotive Safety:</strong> Simulate failure scenarios with varying component parameters</li>
+                <li><strong>Financial Risk:</strong> Analyze portfolio outcomes under multiple market scenarios</li>
+                <li><strong>Scientific Research:</strong> Run general Monte Carlo simulations with automatic statistics</li>
+            </ul>
+        </section>
+
+        <section id="features">
+            <h2>Features</h2>
+            <ul>
+                <li><strong>Type-Safe Measurements</strong> - Prevent confusion between values and probabilities</li>
+                <li><strong>Flexible Trial Logic</strong> - Define trial behavior via agents (closures)</li>
+                <li><strong>Outcome Collection</strong> - Gather results from each trial automatically</li>
+                <li><strong>Statistics Aggregation</strong> - Compute mean, std_dev, min/max, CIs automatically</li>
+                <li><strong>Design by Contract</strong> - Full preconditions, postconditions, invariants</li>
+                <li><strong>Void-Safe</strong> - void_safety="all" prevents null pointer errors</li>
+                <li><strong>SCOOP Compatible</strong> - Ready for concurrent execution (future)</li>
+            </ul>
+        </section>
+
+        <section id="status">
+            <h2>Status</h2>
+            <p><strong>v1.0.0 - Production Ready</strong></p>
+            <ul>
+                <li>25 tests passing (100% pass rate)</li>
+                <li>13 unit tests + 12 adversarial tests</li>
+                <li>Design by Contract throughout</li>
+                <li>Comprehensive documentation</li>
+            </ul>
+        </section>
+
+        <section id="quick-example">
+            <h2>Quick Example</h2>
+            <pre><code>
+local
+    l_exp: MONTE_CARLO_EXPERIMENT
+    l_stats: SIMULATION_STATISTICS
+do
+    create l_exp.make (1000)
+    l_exp.set_trial_logic (agent my_trial_logic)
+    l_exp.run_simulation
+    l_stats := l_exp.statistics
+
+    print ("Mean: " + l_stats.mean.out + "%N")
+    print ("95% CI: [" + l_stats.ci_95.first.out + ", "
+           + l_stats.ci_95.second.out + "]%N")
+end
+            </code></pre>
+        </section>
+
+        <section id="next-steps">
+            <h2>Getting Started</h2>
+            <p><a href="quick.html">Quick API Reference</a> for immediate examples</p>
+            <p><a href="user-guide.html">User Guide</a> for comprehensive instructions</p>
+            <p><a href="api-reference.html">API Reference</a> for complete documentation</p>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Simple Eiffel Contributors. MIT License.</p>
+            <p><a href="https://github.com/simple-eiffel/simple_montecarlo">GitHub Repository</a></p>
+        </footer>
+    </main>
+</body>
+</html>
