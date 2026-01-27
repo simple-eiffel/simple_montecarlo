@@ -1,0 +1,953 @@
+0:00
+The following content is provided under a Creative Commons license. Your support will help MIT OpenCourseWare
+0:06
+continue to offer high quality educational resources for free. To make a donation or to view additional materials
+0:13
+from hundreds of MIT courses, visit MIT OpenCourseWare at OCW.mit.edu.
+0:18
+0:29
+PROFESSOR: Welcome back. I hope you didn't spend time doing 6002 problem
+0:36
+sets while eating turkey. It's not recommended for digestion. But I hope you're ready to go back into diving into material.
+0:43
+And since it's been a week since we got together, let me remind you of what we were doing.
+0:49
+We were looking at the issue of how to understand experimental data.
+0:55
+Data could come from a physical experiment. We had the example of measuring the spring constant of a linear spring.
+1:01
+Could come from biological data. Could come from social data. And what we looked out was the idea
+1:07
+of how do we actually fit models to that data in order to understand them.
+1:13
+So what I want to do is I want to start with that high level reminder of what we were after. I want to do about a five minute recap
+1:20
+of what we were doing last time, because it has been a while. And then we're going to talk about how do you actually validate models
+1:26
+that you're fitting to data to understand are they really good fits or not. And if you remember.
+1:31
+I know you spend all your time thinking about 6002. You should remember I left you with a puzzle, where I fit data to--
+1:37
+sorry, fit models to some noisy data. And there was a question of, did the model really have an order 16 fit?
+1:45
+Right, so what are we trying to do? Remember, our goal is to try and model experimental data.
+1:51
+And really what we want to do is have a model that both explains the phenomena underlying what we see,
+1:57
+gives us a sense of what might be the underlying physical mechanism, the underlying social mechanism,
+2:02
+and can let us make predictions about the behavior in new settings. In the case of my spring, being able to predict
+2:09
+what will the displacement be when I actually put a different weight on it than something I measured. Or if you want to think from a design perspective,
+2:17
+working the other direction and saying, I don't want my spring to deflect more than this amount under certain kinds of weights.
+2:23
+So how do I use the model to tell me what the spring constant should be for the spring I want in that case?
+2:29
+So we want to be able to predict behavior in new settings. The last piece we know is that, if the data was perfect,
+2:36
+this is easy. But it ain't. There's always going to be noise. There's always going to be experimental uncertainty.
+2:42
+And so I really want to account for that uncertainty when I fit that model. And while sometimes I'll have theories that will help--
+2:50
+Hooke says models of springs are linear-- in some cases, I don't. And in those cases, I want to actually try and figure out
+2:57
+what's the best model to fit even when I don't know what the theory tells me.
+3:03
+OK, so quick recap, what do we use to solve this? So we've got a set of observed values.
+Solving for Least Squares (Recap)
+3:10
+My spring case for different displays for different masses I measured the displacements. Those displacements are my observed values.
+3:17
+And if I had a model that would predict what the displacement should be, I
+3:22
+can measure how good the fit is by looking at that expression right there, the sum of the squares of the differences between the observed and the
+3:29
+predicted data. As I said, we could use other measures. We could use a first order and absolute value.
+3:34
+The square is actually really handy, because it makes the solution space very easy to deal with, which we'll get to in a second.
+3:41
+So given observed data, get a prediction. I can use the sum of squared differences to measure how good the fit is.
+3:47
+And then the second piece is I now what to find what's the best way to predict the data.
+3:52
+What's the best curve that fits the data. What's the best model for protecting the values.
+3:57
+And we suggest that last time, we'll focus on mathematical expressions, polynomials.
+4:03
+Professor Guttag is so excited about polynomial expressions, he's throwing laptops on the floor. Please don't do that to your laptop.
+4:10
+We're going to fit polynomials to these expressions. And since the polynomials have some coefficients,
+4:17
+the game is basically, how do I find the coefficients of the polynomial that minimize that expression.
+4:23
+And that, we said, was an example of linear regression. So let me just remind you what linear regression says.
+4:29
+Simple example, case of the spring. I'm going to get a degree 1 polynomial.
+4:34
+So that is something of the form y is ax plus b. a and b are the three variables, the parameters I can change.
+4:42
+And the idea is for every x, in the case of my spring, for every mass, I'm going to use that model
+4:48
+to predict what's the displacement, measure the differences, and find the thing that minimizes it. So I just want to find values of a and b
+4:54
+that let me predict values that minimize that expression. As I suggested, you could solve this.
+5:01
+You could write code to do it. It's a neat little piece of code to write. But fortunately, PiLab provides that for you.
+5:07
+And I just want to give you the visualization of what we're doing here. And then we're going to look at examples.
+5:13
+I'm going to try to find the best line. It's represented by two values, a and b.
+5:18
+I could represent all possible lines in a space that has one access with values
+Finding the best curve (simplest case)
+5:25
+and the other access with b values. Every point in that plane defines a line for me.
+5:30
+Now imagine a surface laid over this two dimensional space,
+5:36
+where the value or the height of the surface is the value of that objective function at every point.
+5:41
+Don't worry about computing it all, but just imagine I could do that. And by the way, one of the nice things
+5:46
+about doing sum of squares is that surface always has a concave shape. And now the idea of linear regression
+5:53
+is I'm going to start at some point on that surface. And I'm just going to walk downhill
+5:59
+until I get to the bottom. There will always be one bottom, one point. And once I get to that point, that a and b value
+6:07
+tell me the best line. So it's called linear regression because I'm linearly walking downhill on this space.
+6:14
+Now I'm doing this for line with two parameters a,b, because it's easy to visualize.
+6:20
+If you're a good mathematician even if you're not, you can generalize this to think about arbitrary dimensions.
+6:25
+So a fourth order surface in a five dimensional space, for example, would solve a cubic example of this.
+6:33
+That's the idea of linear regression. That's what we're going to use to actually figure out, to find the best solution.
+6:40
+So here was the example I used. I gave you a set of data. In about 3 slides, I'm going to tell you where the data came from.
+Another Experiment (Recap)
+6:45
+But I give you a set of data. We could fit the best line to this using that linear regression idea.
+6:52
+And again, last piece of reminder, I'm going to use polyfit from PiLab.
+6:58
+It just solves that linear regression problem. And I give it a set of x values. I give a corresponding set of y values,
+7:04
+need to be the same number in each case. And I give it a dimension. And in this case, one says, find the best fitting line.
+7:12
+It will produce that and return it as a tuple, which I'll store under the name model 1. And I could plot it out.
+7:18
+So just remind you, polyfit will find the best fitting n dimensional surface, n being that last parameter there,
+7:25
+and return it. In a second, we're going to use polyval, which will say, given that model and a set of x values,
+7:32
+predict what the y value should be. Apply them. OK, so I fit the line.
+7:40
+What do you think? Good fit? Not so much, right?
+7:45
+Pretty ugly. I mean, you can see it's probably the best-- or not probably. It is the best fitting line.
+7:50
+It sort of accounts for the variation on either side of it. But it's not a very good fit.
+7:56
+So then the question is, well why not try fitting a higher order model? So I could fit a quadratic.
+8:03
+That is a second order model. y equals ax squared plus bx plus c.
+8:09
+Run the same code. Block that out. And I get that.
+8:14
+That's the linear model. There's the quadratic model.
+8:19
+At least my [? i ?] our looks a lot better, right? It looks like it's following that data reasonably well.
+8:26
+OK, I can fit a linear model. I can fit a quadratic model. What about higher order models?
+8:31
+What about a fourth order model, an eighth order model, a 644th order model? How do I know which one is going to be best?
+8:39
+So for that, I'm going to remind you of the last thing we used. And then we're going to start talking about how to use it further, which is if we try fitting higher order
+8:46
+polynomials, do we get a better fit? And to do that, we need to measure what
+8:52
+it means for the data to fit. If I don't have any other information.
+8:58
+For example, if I don't have a theory that tells me this should be linear in the case afoot,
+9:03
+then the best way to do it is to use what's called, the coefficient of determination, r-squared.
+9:09
+It's a scale independent thing, which is good. By scale independent, I mean if I take all the data and stretch it out, this will still
+9:15
+give me back the same value in terms of the fit. So it doesn't depend on the size of the data. And what it does is it basically tells me the
+9:22
+a value between 0 and 1, how well does this model fit the data.
+9:28
+So just to remind you, in this case, the y's are the measured values, the p's
+9:34
+are the predicted values. That's what my model is saying, for each one of these cases. And mu down here is the mean or the average
+9:42
+of the measured values. The way to think about this is this top expression here.
+9:48
+Well, that's exactly what I'm trying to minimize, right? So it's giving me an estimate or a measure
+9:54
+of the error in the estimates between what the model says and what I actually measure.
+10:00
+And the denominator down here basically tells me how much does the data vary away from the mean value.
+10:08
+Now here's the idea. If in fact, I can get this to 0, I
+10:14
+can get a model that completely accounts for all the variation in the estimates, that's great.
+10:20
+It says, the model has fit perfectly. And that means this is 0 so this r value or r squared value
+10:26
+is 1. On the other hand, if this is equal to that, meaning
+10:32
+that all of the variation in the estimates accounts for none of the variation in the data,
+10:37
+then this is 1 and this goes to 0. So the idea is that an r-squared value is close to 1 is great.
+10:45
+It says, the model is a good fit to the data. r-squared value is getting closer to 0, not so good.
+10:52
+OK, so I ran this, fitting models of order 2,
+Can We Get a Tighter Fit?
+10:58
+4, 8, and 16. Now you can see that model 2, that's the green line here.
+11:05
+That's the one that we saw before. It's basically a parabolic kind of arc. It kind of follows the data pretty well.
+11:12
+But if I look at those r-squared values. Wow, look at that.
+11:17
+Order 16 fit accounts for all but 3% of the variation in the data.
+11:24
+It's a great fit. And you can see. You can see how it follows. It actually goes through most, but not quite all,
+11:30
+of the data points. So it's following them pretty well. OK, so if that's the case, the order 16 fit
+11:39
+is really the best fit. Should we just use it? And I left you last time with that quote that says,
+11:45
+from your parents, right, your mother telling you, just because you can do something doesn't mean you should do something.
+11:51
+I'll leave it at that. Same thing applies here. Why are we building the model?
+11:58
+Remember, I said two reasons. One is to be able to explain the phenomena.
+12:03
+And the second one is to be able to make predictions. So I want to be able to explain the phenomena
+12:10
+in the case of a spring, with things like it's linear and then that gives me a sense of a linear relationship
+12:15
+between compression and force. In this case, a 16th order model,
+12:22
+what kind of physical process has an order 16 variation?
+12:28
+Sounds a little painful. So maybe not a great insight into the process.
+12:34
+But the second reason is I want to be able to predict future behavior of this system.
+12:40
+In the case of this spring, I put a different weight on than I've done before. I want to predict what the displacement is going to be.
+12:47
+I've done a set of trials for an FDA approval of a drug. Now I want to predict the effect of a treatment on a new patient.
+12:53
+How do I use the model to help me with that? One that maybe not so good, currently, I want to predict the outcome of an election.
+12:59
+Maybe those models need to be fixed from, at least, what happened the last time around. But I need to be able to make the prediction.
+13:05
+So another way of saying it is, a good model both explains the phenomena and let's me make the predictions.
+13:12
+OK, so let's go back, then, to our example. And before I do it, let me tell you where that data came from.
+13:20
+I actually built that data by looking at another kind of physical phenomenon. And it was a lot of them.
+13:25
+Things that follow a parabolic arc. So for example, comets. Any particle under the influence of a uniform gravitational
+13:33
+field follows a parabolic arc, which i why Halley's comet gets really close for a while, and then goes away off into the solar system,
+Motivation for Mystery Data - Parabola
+13:40
+and comes back around. My favorite example-- I'm biased on this. And I know you all know which team I root for.
+13:46
+But there is Tom Brady throwing a pass against the Pittsburgh Steelers. Center of mass of the past follows a nice parabolic arc.
+13:54
+Even in design, you see parabolic arcs in lots of places. They have nice properties in terms
+13:59
+of disbursement of loads and forces, which is why architects like to use them.
+14:05
+So here's how I generated the data. I wrote a little function. Actually, I didn't.
+14:10
+Professor Guttag did, but I borrowed it. It took in three parameters, a, b, and c.
+How Mystery Data Was Generated
+14:16
+ax squared plus bx plus c. I gave it a set of x values.
+14:21
+Those are the independent measurements, the things along the horizontal axis. And notice what I did.
+14:27
+I generated values given an a, b, and c, for that equation.
+14:34
+And then I added in some noise. So random.guass takes a mean and a standard deviation,
+14:40
+and it generates noise following that bell shaped curve that goes in the distribution.
+14:46
+So the 0 says it's 0 mean, meaning there's no bias. It's going to be equally likely to be above or below the value,
+14:52
+positive or negative. But 35 is a pretty good standard deviation. This is putting a lot of noise into the data.
+14:59
+And then I just added that into y values. The rest of this, you can see, it's simply going to write it into a file, a set of x and y values.
+15:06
+But this will generate, given a value for a, b, and c, data from a parabolic arc with noise added to it.
+15:13
+And in this case, I took it as y equals 3x squared. And then c and c are 0.
+15:19
+And that's how I generated it. What I want to do, I want to see how well this model actually
+15:26
+predicts behavior. So one of the ways I could do it, to say, all right, the question I want to ask is, whoa,
+15:31
+if I generated the data from a degree 2 polynomial quadratic, why in the world is the 16th order polynomial the,
+15:39
+"best fit?" So let's test it out.
+15:47
+I'm going to give 3-- sorry, 4. I can't count. 4 different degrees, order 2, order 4, order 8, order 16.
+15:56
+And I've generated two different datasets, using exactly that code.
+16:01
+I just ran it twice. It's going to have slightly different values, because the noise is going to be different in each case.
+16:06
+But they're both coming from that a, y equals 3x squared equation.
+16:12
+And the code here basically says, I'm going to take those two data sets and basically, get the x and y values out, and then
+Let's Look at Two Data Sets
+16:18
+fit models. So I'll remind you, genFits takes in a collection of x and y values and a list
+16:26
+or a tuple of degrees, and for each degree, finds, using Polyfit, the best model.
+16:32
+So models one will be 4 models for order 2, 4, 8, and 16.
+16:38
+And similarly, down here, I'm going to do the same thing, but using the second data set.
+16:43
+And I'm going to fit, again, a set of models. And then I'll remind you, test fits, which you saw last time.
+16:49
+I know it's a while ago, basically takes a set of models, a corresponding set of degrees, x and y values,
+16:57
+and says, for each model in that degree, measure how well that model meets the fit, using
+17:05
+that r-squared value. So testFits is going to get us back a set of r-squared values. All right, with that in mind, I've got the code here.
+17:15
+Let's run it. And here we go.
+17:21
+I'm going to run that code. Ha, I get two fits.
+17:26
+Looks good. Let's look at the values.
+17:32
+So there's the first data set. All right, the green line still is doing not a bad job.
+Fits for Dataset 1
+17:40
+The purple line, boy, is fitting it really well. And again, notice here's the best fit.
+17:45
+That's amazing. That is accounting for all but 0.4%
+17:50
+of the variation in the data. Great fit. Order 16. Came from an order 2 thing.
+17:57
+All right, what about the second data set? Oh, grumph.
+18:03
+It also says order 16 fit is the best fit.
+18:08
+Not quite as good. It accounts for all but about 2% of the variation. Again, the green line, the red line, do OK.
+18:15
+But in this case, again, that purple line is still the best fit. So I've still got this puzzle.
+18:21
+But I didn't quite test what I wanted, right? I said I want to see how well it predicts new behavior.
+18:29
+Here what I did was I took two datasets, fit the model, and I got two different fits, one for each dataset.
+18:35
+They both fit well for order 16. But they're not quite right. OK, so best fitting model is still order 16
+18:43
+but we know it came from an order 2 polynomial. So how could I will get a handle on seeing
+18:49
+how good this model is? Well, what we're seeing here is coming from training error.
+18:56
+Or another way of saying it is, what we're measuring is how well does the model perform
+19:02
+on the data from which it was learned? How well do I fit the model to the training data?
+19:10
+I want a small training error. And if you think about it, go back to the first example, when I fit a line to this data, it did not do well.
+19:16
+It was not a good model. When I fit a quadratic, it was pretty decent. And then I got better and better as I went on.
+19:23
+So I certainly need at least a small training error. But it's, to use the mathematical terms, a necessary, but not sufficient condition to get a great model.
+19:32
+I need a small training error, but I really want to make sure that the model is capturing what I'd like.
+19:37
+And so for that, I want to see how well does it do on other gen data, generated
+19:42
+from the same process, whether it's weights on springs, different comets besides Haley's comet,
+19:49
+different voters than those surveyed when we tried to figure out what's going to happen in an election.
+19:54
+And I'm set up to do that, by using a really important tool called, validation or cross-validation.
+20:03
+We set the stage, and then we're going to do the example. I'm going to get a set of data. I want to fit a model to it, actually,
+20:09
+different models, different degrees, different kinds of models. To see how well they work, I want
+20:14
+to see how well they predict behavior under other data than that from which I did the training.
+20:21
+So I could do that right here. I could generate the models from one data set,
+Cross Validate
+20:27
+but test them on the other. And so in fact, I had one data set. I build a set of models for the first data set.
+20:34
+I compared how well it did on that data set. But I could now apply it to the second dataset.
+20:40
+How well does that account for that data set? And similarly, take the models I built for the second data set,
+20:46
+and see how well they predict the points from the first dataset.
+20:51
+What do I expect? Certainly, expect that the testing error is likely to be larger than the training error,
+20:57
+because I train on one set of data. And that means this ought to be a better way to think about, how well does this model generalize?
+21:05
+How well does it predict other behavior, besides what I started with.
+21:11
+So here's the code I'm going to use. It's pretty straightforward. All I want to draw your attention to here is, remember, models one I built by fitting models of degree 2, 4, 8,
+Test Code
+21:19
+and 16 to the first data set. And I'm going to apply those models to the second dataset,
+21:26
+x vals 2 and y vals 2. Similarly, I'm going to take the models built for the second data set, and test them on the first dataset
+21:36
+to see how well they fit. I know you're eagerly anticipating, as I've been setting this up for a whole week.
+21:43
+All right, let's look at what happens when I do this. I'm going to run it. And then we'll look at the examples.
+21:48
+If I go back over to Python and this code was distributed earlier, if you want to play with it yourself.
+21:56
+Should be the right place to do it. I am going to run that code.
+22:05
+Now I get something a little different. In fact, if I go look at it, here
+22:15
+is model one applied to data set 2.
+Train on Dataset 1, Test on Dataset 2
+22:20
+And we can both eyeball it and look at the numbers. Eyeballing it, there's that green line, still generally
+22:27
+following the form of this pretty well. What about the purple line? The order 16 degree.
+22:33
+Remember, that's the purple line from model 1, from training set 1. Wow, this misses a bunch of points, pretty badly.
+22:41
+And in fact, look at the r-squared values. Order 2 and order 4, pretty good fit,
+22:49
+accounts for all but about 14, 13% of the data. Look what happened to the degree 16, degrees 16 fit.
+22:58
+Way down at last. 0.7. Last time around it was 0.997.
+23:04
+What about the other direction? Taking the model built and the second data set, testing it on the first data set.
+23:11
+Again, notice a nice fit for degree 2 and 4,
+23:17
+not so good for degree 16. And just to give you a sense of this, I'm going to go back.
+23:22
+There is the model one case.
+23:28
+There is the model in the other case. You can see the model that accounts for variation in one doesn't account for the variation in the other, when
+23:34
+I look at order 16 fit. OK, so what this says is something important.
+23:42
+Now I can see. In fact, if I look back at this, if I were just looking at the coefficient of determination,
+23:49
+this says, in order to predict other behavior, I'm better off with an order 2 or maybe order 4 polynomial.
+23:57
+Those r-squared values are both the same. I happen to know it's order 2, because that's where I generated from. But that's a whole lot better than order 16.
+24:06
+And what you're seeing here is an example of something that happens a lot in statistics.
+24:11
+And in fact, I would suggest is often misused in fitting data to statistical samples.
+24:18
+It's called overfitting. And what it means is I've let there be too many degrees of freedom in my model, too
+24:24
+many free parameters. And what it's fitting isn't just the underlying process.
+24:29
+It's also fitting to the noise. The message I want you to take out of this part of the lecture
+24:35
+is, if we only fit the model to training data, and we look at how well it does, we
+24:41
+could get what looks like a great fit, but we may actually have come up with far too complex a model.
+24:47
+Order 16 instead of order 2. And the only way you are likely to detect that is to train on one test set and test on a different.
+24:57
+And if you do that, it's likely to expose whether, in fact, I have done a good job of fitting or whether I have overfit to the data.
+25:04
+There are lots of horror stories in the literature, especially from early days of machine learning of people overfitting to data and coming up with models
+25:10
+that they thought wonderfully predicted an effect, and then when it ran on new data really hit the big one.
+25:17
+All right, so this is something you want to try and stay away from. And the best way to do it is to do validation.
+25:24
+You can see it here, right? The upper left is my training data, dataset one. There's the set of models.
+Training and Testing Errors
+25:31
+This is now taking that and applying it to a different dataset from the same process.
+25:36
+And notice for the degree to polynomial, the coefficient of determination, 0.86, now 0.87.
+25:44
+The fact that it's slightly higher is just accidental. But it's really about the same level.
+25:49
+It's doing the same kind of drop on the training data and on the test data. On the other hand, degree 16, coefficient of determination
+25:58
+is a wonderful 0.96 here and a pretty awful 9 down there.
+26:05
+And that's a sign that we're not in good shape, when in fact our coefficient of determination
+26:11
+drops significantly when we try and handle new data. OK, so why do we get a better fit
+26:22
+on the training data with a higher order model, but then do less well when we're actually handling new data?
+26:28
+Or another way of saying it is, if I started out with, in the case of that with that data, a linear model
+26:35
+it didn't fit well, and then I got to a quadratic model, why didn't that quadratic model still say [INAUDIBLE]?
+26:41
+Why was it the case that, as I added more degrees of freedom, I did better.
+26:47
+Or another way of asking it is, can I actually get a worse fit to training data as I increase the model complexity?
+26:55
+And I see at least one negative head shake. Thank you. You're right. I cannot. Let's look at why.
+27:01
+If I add in some higher order terms, and they actually don't matter. If I got perfect data, the coefficient will just be 0.
+27:09
+The fit will basically say, this term doesn't matter. Ignore it. And that'll work in perfect data.
+27:15
+But if the data is noisy, what the model is going to do is actually start fitting the noise.
+27:22
+And while it may lead to a better r-squared value, it's not really a better fit. Right, let me show you an example of that.
+27:29
+I'm going to fit a quadratic to a straight line. Easy thing to do. But I want to show you the effect of overfitting or adding
+27:36
+in those extra terms. So let me say it a little bit better. I'm going to start off with this 3, sorry, 3. I'm doing it again today.
+Fitting a Quadratic to a Perfect Line
+27:42
+4 simple values, 0, 1, 2, 3. The y values are the same as x values.
+27:47
+So this is 0,0, 1, 1, 2, 2, 3 3. They're all lying on a line. But I'm going to fit. I'm going to plot them out.
+27:54
+And then I'm going to fit a quadratic. y if it equals ax squared plus bx plus c to this.
+28:02
+Now I know it's a line, but I want to see what happens if I fit a quadratic. So I'm going to use polyfit to fit my quadratic.
+28:08
+I'm going to print out some data about it. And then I'm going to use Polyval to estimate
+28:14
+what those values should be. Plot them out. And then compute r squared value, and see what happens.
+28:22
+All right, OK, and let me set this up better. What am I doing? I want to just fit it to a line. I know it's a line, but I'm going to fit a quadratic to it.
+28:29
+And what I'd expect is, even though there's an extra term there, it shouldn't matter.
+28:34
+So if I go to Python, and I run this,
+28:40
+I run exactly that example, look at that.
+28:46
+a equals 0, b is 1, c equals 0. Look at the r-squared value. I'll pull that together for you.
+28:52
+It says, in this perfect case, there's what I get.
+29:01
+The blue line is drawn through the actual values. The dotted red line is drawn through the predicted values.
+29:06
+They exactly line up. And in fact, the solution implied says, the higher order term coefficient 0,
+29:12
+it doesn't matter. So what it found was y equals x. I know you're totally impressed I could find a straight line.
+29:19
+But notice what happened there. I dropped or that system said, you don't need the higher order term.
+29:24
+Wonderful r-squared value. OK, let's see how well it predicts.
+29:29
+Let's add in one more point, out at 20. So this is 0, 1, 2, 3. That's 0, 1, 2, 3.
+29:35
+I'm going to add 20 in there, so it's 0, 0 , 1, 2, 2, 3, 3, 20, 20. Again, I can estimate using the same model.
+29:43
+So I'm not recomputing the model, the model I predicted from using those first set of four points. I can get the estimated y values,
+29:50
+plot those out, and you again, compute the r-squared value here. And even adding that point in, there's the line.
+29:58
+And guess what. Perfectly predicts it. No big surprise.
+30:04
+So it says, in the case of perfect data, adding the higher order terms isn't going to cause a problem. The system will say coefficients are 0.
+30:11
+That's all I need. All right, now, let's go back and add in just a tiny bit
+30:17
+of noise right there. 0, 0, 1, 1, 2, 2, and 3, 3.1.
+30:22
+So I've got a slight deviation in the y value there. Again, I can plot them. I'm going to fit a quadratic to them.
+30:29
+I'm going to print out some information about it and then get the estimated values using that new model to see what it should look like.
+30:38
+I'm not going to run it. I'm going to show you the result. I get a really good r-squared value.
+Simulate a Small Measurement Error
+30:43
+And there's the equation it comes up with.
+30:48
+Not so bad, right? It's almost y equal to x. But because of that little bit of noise
+30:55
+there, there's a small second order term here and a little constant term down there. The y squared value is really pretty good.
+31:03
+And if you really squint and look carefully at this, you'll actually see there's a little bit of a deviation between the red and the blue line.
+31:11
+It undershoots-- sorry, overshoots there, undershoots here, but it's really pretty close.
+31:17
+All right, so am I just whistling in the dark here? What's the difference? Well, now let's add in that extra point.
+31:25
+And what happens? So again, I'm now taking the same set of points 0, 0, 1, 1,
+Predict Another Point Using Same Model
+31:30
+2, 2, 3, and 3.1. I'm going to do 20, 20. Using the model I captured from fitting to that first set,
+31:38
+I want to see what happens here. Crap.
+31:43
+I'm sorry. Shouldn't say that. Darn. Pick up some other word.
+31:49
+Shouldn't surprise you, right? A small variation here is now causing a really large
+31:55
+variation up there. And this is why the ideal case overfitting is not a problem,
+32:02
+because the coefficients get zeroed out. But even a little bit of noise can cause a problem. Now I'll grant you, we set this up deliberately
+32:10
+to show a big effect here. But a 3% error in one data point is causing a huge problem
+32:16
+when I get further out on this curve. And by the way, there is the r-squared values. It's 0.7. It doesn't do a particularly good job
+32:25
+OK, so how would I fix this? Well, what if I had simply done a first degree
+32:32
+fit, same situation. Let's say fit a line to this rather than fitting a quadratic.
+32:38
+Remember, my question was, what's the harm of fitting a higher order model if the coefficients would be zeroed out?
+32:43
+We've seen they won't be zeroed out. But if I were just to have fit a line to this, exactly the same experiment, 0, 0, 1, 1, 2,
+32:51
+2, 3, and 3.1, 20 and 20. Now you can see it still does a really good job of fitting.
+33:00
+The r-squared value is 0.9988. So again, fitting the right level of model, the noise
+33:07
+doesn't cause nearly as much of a problem. And so just to pull that together, basically it says,
+33:13
+the predictive ability of the first order model is much better than the second order model.
+Comparing first and second degree fits
+33:19
+And that's why, in this case, I would want to use that first order model.
+33:25
+So take home message. And then we're going to amplify this. If I pick an overly complex model,
+33:32
+I have the danger of overfitting to the training data, overfitting meaning that I'm not only fitting the underlying
+33:38
+process, I'm fitting the noise. I get an order 16 model is the best fit when it's in fact, in order 2 model that was generating it.
+33:46
+That increases the risk that it's not going to do well with the data, not what I'd like. I want to be able to predict what's
+33:53
+going to go on well here. On the other hand. So that would say, boy, just stick with the simplest
+33:59
+possible model. But there's a trade off here. And we already saw that when I tried
+34:04
+to fit a line to a data that was basically quadratic. I didn't get a good fit. So I'd want to find the balance.
+34:10
+An insufficiently complex model won't explain the data well. An overly complex model will overfit the training data.
+34:19
+So I'd like to find the place where the model is as simple as possible, but still explains the data.
+34:25
+And I can't resist the quote from Einstein that captures it pretty well, "everything should be made as simple
+34:30
+as possible, but not simpler." In the case of where I started, it should be fit to a quadratic, because it's the right fit.
+34:37
+But don't fit more than that, because it's getting overly complex
+34:42
+Now how might we go about finding the right model?
+34:47
+We're not going to dwell on this but here is a standard way in which you might do it. Start with a low order model.
+34:53
+Again, take that data. Fit a linear model to it. Look at not only the r-squared value,
+34:59
+but see how well it accounts for new data. Increase the order of the model.
+35:04
+Repeat the process. And keep doing that until you find a point at which a model does a good job both on the training
+35:11
+data and on predicting new data. An after it starts to fall off, that gives you a point where you might say there's
+35:18
+a good sized model. In the case of this data, whether I would have stopped at a quadratic or I might have used a cubic or a quartic
+35:24
+depends on the values. But I certainly wouldn't have gone much beyond that. And this is one way, if you don't have a theory
+35:30
+to drive you, to think about, how do I actually fit the model the way I would like.
+35:37
+Let's go back to where we started. We still have one more big topic to do, and we still have a few minutes left. But let's go back to where we started Hooke's law.
+35:45
+There was the data from measuring displacements of a spring, as I added different weights
+35:50
+to the bottom of the spring. And there's the linear fit. It's not bad.
+35:56
+There's the quadratic fit. And it's certainly got a better r-squared value, though. That could be just fitting to the noise.
+36:03
+But you actually can see, I think, that that green curve probably does a better job of fitting the data.
+36:11
+Well, wait a minute. Even though the quadratic fit is tighter here, Hooke says, this is linear.
+36:20
+So what's going on? Well, this is another place where you want to think about your model. And I'll remind you, in case you don't remember your physics,
+36:28
+unless we believe that Hooke was wrong, this should tell us something. And in particular, Hooke's law says, the model
+36:33
+holds until you reach the elastic limit of the spring. You stretch a slinky too far, it never springs back.
+36:42
+You go beyond that elastic limit. And that's probably what's happening right up there.
+36:47
+Through here, it's following that linear relationship. Up at this point, I've essentially broken the spring.
+36:53
+The elastic limit doesn't hold anymore. And so really, in this case, I should probably
+36:58
+fit different models to different segments. And there's a much better fit.
+37:05
+Linear through the first part and another later line once I hit that elastic limit.
+37:11
+How might I find this? Well, you could imagine a little search process in which you try
+37:16
+and find where's the best place along here to break the data into two sets, fit linear segments to both,
+37:23
+and get really good fits for both examples. And I raise it because that's the kind of thing
+37:29
+you've also seen before. You could imagine writing code to do that search to find that good fit.
+37:35
+OK, that gives you a sense, then, of why you want to be careful about overfitting,
+37:41
+why you want to not just look at the coefficient of determination, but see how well does this predict behavior
+37:46
+on new data sets. Now suppose I don't have a theory, like Hooke,
+37:52
+to guide me. Can I still figure out what's a good model to fit to the data?
+37:58
+And the answer is, you bet. We're going to use cross-validation to guide the choice of the model complexity.
+38:04
+And I want to show you two examples. If the data set's small, we can use
+38:10
+what's called leave one out cross-validation. I'll give you a definition of that in a second.
+38:15
+If the data sets bigger than that, we can use k-fold cross-validation. I'll give you a definition that a second.
+38:21
+Or just what's called, repeated random sampling. But we can use this same idea of validating new data
+38:27
+to try and figure out whether the model is a good model or not. Leave one out cross-validation.
+38:33
+This is as written in pseudocode, but the idea is pretty simple. I'm given a dataset. It's not too large.
+Leave-one-out Cross Validation
+38:40
+The idea is to walk through a number of trials, number trials equal to the size of the data set.
+38:47
+And for each one, take the data set or a copy of it, and drop out one of the samples.
+38:52
+So leave one out. Start off by leaving out the first one, then leaving out the second one, and then leaving out the third one.
+38:58
+For each one of those training sets, build the model. For example, by using linear regression.
+39:04
+And then test that model on that data point that you left out.
+39:10
+So leave out the first one, build a model on all of the other ones, and then see how well that model predicts the first one.
+39:15
+Leave out the second one, build a model using all of them but the second one, see how well it predicts the second one. And just average the result. Works
+39:21
+when you don't have a really large data set, because it won't take too long. But it's a nice way of actually testing validation.
+39:30
+If the data set's a lot bigger, you can still use the same idea. You can use what's called, k-fold.
+39:35
+Divide the data set up into k equal sized chunks. Leave one of them out.
+39:41
+Use the rest to build the model. And then use that model to predict that first chunk you left out.
+39:47
+Leave out the second chunk, and keep doing it. Same idea, but now with groups of things rather than just leaving those single data points.
+39:55
+All right, the other way you can deal with it, which has a nice effect to it, is to use what's called, repeated random sampling.
+40:03
+OK, start out with some data set. And what I'm going to do here is I'm going to run through some number of trials.
+Repeated Random Sampling
+40:09
+I'm going to call that, k. But I'm also going to pick some number of random samples from the data set.
+40:15
+Usually, I think, and as I recall, it is somewhere between reserving 20% to 50% of the samples.
+40:22
+But the idea is again, walk over all of those k trials. And in each one, pick out at random n elements
+40:29
+for the test set. Use the remainder is the training set. Build the model on the training set.
+40:34
+And then apply that model to the test set. So rather than doing k-fold, where I select k,
+40:40
+in turn, and keep them. This is just randomly selecting which ones to pull out.
+40:46
+So I'm going to show you one last example. Let's look at that idea of, I don't have a model here. I want to use this idea of cross-validation
+40:54
+to try and figure out what's the best possible model. And for this, I'm going to use a different data set.
+41:00
+The data set here is I want to model or the task here is I want to try model how the mean daily high temperature in the US
+41:07
+has varied over about a 55 year period, from '61 to 2015.
+41:14
+Got a set of data. It's mean-- sorry, the daily high for every day of the year through that entire period.
+41:19
+And what I'm going to do is I'm going to compute the means for each year and plot them out. And then I'm going to try and fit models to them.
+41:26
+And in particular, I'm going to take a set of different dimensionalities, linear, quadratic, cubic, quartic And in each case,
+41:34
+I'm going to run through a trial where I train on one half of the data, test on the other. There again, is that idea of seeing how well it
+41:41
+predicts other data. Record the coefficient of determination. And do that and get out an average,
+41:47
+and report what I get as the mean for each of those values across each dimensionality.
+41:53
+OK, here we go. Set a code that's pretty easy to see. Hopefully, you can just look at it and grok it.
+41:59
+We start off with a boring class, which Professor guttag suggests refers to this lecture. But it doesn't.
+42:04
+This may be a boring lecture, but it's not a boring class. This is a great class. And boy, those jokes are really awful, aren't they?
+42:10
+But here we go. Simple class that builds temperature data.
+42:15
+This reads in some information, splits it up, and basically, records the high for the day and the year in which I got that.
+42:23
+So for each day, I've got a high temperature for that day. I'm going to give you back the high temperature and the year
+42:28
+in which it was recorded, because I don't care whether it was in January or June. A little function that opens up a file.
+42:35
+We've actually given you a file, if you want to go look at it. And simply walk through the file reading it in and returning a big list of all those data objects.
+42:45
+OK, then what I want to do is I want to get the mean high temperature for each year.
+42:52
+Given that data, I'm going to set up a dictionary called, years. I'm just going to run through a loop through all the data
+42:57
+points, where in the dictionary, under that year. So there a data point. I use the method get year to get out the year.
+43:04
+At that point, I add in the high temperature corresponding to that data point.
+43:11
+And I'm using that nice little try except loop. I'll do that, unless I haven't had anything yet for this year, in which case this'll fail.
+43:17
+And I'll simply store the first one in as a list. So after I've run through this loop in the dictionary, under the year, I have a list of the high temperatures
+43:24
+for each day associated with it. Excuse me. And then I can just compute the average, that
+43:30
+is for each year in the years. I get that value. I add them up. I get the length. I divide them out.
+43:36
+And I store that in as the average high temperature for the year.
+43:42
+Now I can plot it. Get the data, get out the information by computing those yearly means, run through a little loop
+43:49
+that basically, in the x values, puts in the year, in the y values, puts in the high temperature.
+43:56
+And I can do a plot. And if I do that, I get that.
+44:02
+I'll let you run this yourself. Now this is a little bit deceptive, because of the scale
+44:09
+I've used here. But nonetheless, it shows, in the US, over a 55 year period, the mean high day--
+44:15
+I'm sorry. The mean daily high has gone from about 15.5 degrees Celsius up to about 17 and 1/2.
+44:23
+So what's changed? Now the question is, how could I model this?
+44:29
+Could I actually get a model that would give me a sense of how this is changing? And that's why I'm going to use cross-validation.
+44:37
+I'm going to run through a number of trials, 10 trials. I'm going to try and fit four different models,
+Initialize Things
+44:43
+linear, quadratic, cubic, quartic. And for each of these dimensions,
+44:49
+I'm going to get out a set of r-squared values. So I'm just going to initialize that dictionary. an empty list.
+44:56
+Now here is how I'm going to do this. Got a list of x-values. Those are years. Got a list of y values.
+45:02
+Those are average highs, daily highs. I'm going to create a list of random samples.
+45:10
+So if you haven't seen this before, random.sample says, given this iterator, which you can think
+45:15
+of as the collection from 0 up to n minus 1, it's going to select this many or half of them, in this case,
+45:23
+of those numbers at random. So if I give it 0 up to 9, and I say, pick five of them,
+45:30
+it will, at random, give me back 5 of those 10 numbers, with no duplicates.
+45:36
+Ah, that's nice. Because now notice what I can do. I'm going to set up a training--
+45:41
+sorry, an x and y values for a training set, x and y values for the test set. And I'm just going to run through a loop here,
+45:47
+where if this index is in that list, I'll stick it in the training set.
+45:53
+Otherwise, I'll stick it in the test set. And then I just return them.
+45:59
+So this is a really nice way of, at random, just splitting the data set into a test set and a training set.
+46:08
+And then finally, I can run over the number of trials I want to deal with. In each case, get a different training
+Train, Test, and Report
+46:15
+and test set, at random. And then, for each dimension, do the fit.
+46:20
+There's polyfit on the training x and training y values in that dimension. Gives you back a model.
+46:26
+I could just check to see how well the training set gets, but I really want to look at, given that model,
+46:32
+how well does polyval predict the test set, right? The model will say, here's what I expect is the values.
+46:39
+I'm going to compare that to the actual values that I saw from the training set,
+46:44
+computing that r squared value and adding it in. And then the last of this just says,
+46:49
+I'll run this through a set of examples. OK, here's what happens if I do that.
+46:56
+I'm not going to run it, although the code will run it. Let me, again, remind you what I'm doing. I got a big set of data I'm going
+47:03
+to pick out at random, subsets of it, build the model on one part, test it on the other part.
+47:09
+And if I run it, I get a linear fit, quadratic fit, cubic fit,
+47:16
+and a quartic fit. And here's the standard deviation of those samples. Remember, I've got multiple trials.
+47:22
+I've got 10 trials, in this case. So this gives me the average over those trials. And this tells me how much they vary.
+47:29
+What can I conclude from this? Well, I would argue that the linear fit's probably
+47:34
+the winner here. Goes back to Einstein. I want the simplest possible model that accounts for it.
+47:41
+And you can see it's got the highest r-squared value, which is already a good sign.
+47:46
+It's got the smallest deviation across the trials, which says it's probably a pretty good fit.
+47:52
+And it's the simplest model. So linear sounds like a pretty good fit.
+47:58
+Now, why should we run multiple data sets to test this? I ran 10 trials of each one of these dimensions.
+48:04
+Why bother with it? Well, notice that those deviations-- I'll go back to it here--
+48:11
+they're pretty good. They're about an order of magnitude less than the actual mean, which says they're pretty tight, but they're still reasonable size.
+48:20
+And that suggests that, while there's good agreement, the deviations are large enough that you could see a range of variation across the trials.
+48:28
+So in fact, if I had just run one trial, I could have been screwed. Sorry, oh-- sorry, pick your favorite [INAUDIBLE] here.
+48:35
+[? Hose ?] is a Canadian expression, in case you haven't seen it. Here are the r-squared values for each trial
+48:42
+of the linear fit. And you can see the mean comes up pretty well. But notice, if I'd only run one trial
+48:48
+and I happened to get that one, oh, darn. That's a really low r-squared value.
+48:54
+And we might have decided, in this case, a different conclusion, that the linear fit was not a good fit.
+49:00
+So this is a way of saying, even in a random sampling, run multiple trials, because it lets you
+49:06
+get statistics on those trials, as well as statistics within each trial. So with any trial, I'm doing a whole bunch
+49:12
+of different random samples on measuring those values. And then, across those trials, I'm seeing what the deviation is.
+49:18
+I'm going to hope my machine comes back, because what I want to do is then pull this together.
+49:24
+What have we done? Something you're going to use. We've seen how you can use linear regression to fit a curve to data, 2D, 3D, 6D, however big
+49:33
+the data set is. It gives us a mapping from the independent values to the dependent values.
+49:39
+And that can then be used to predict values associated with the independent values that we haven't seen yet.
+49:46
+That leads, naturally, to both a way to measure, which is r squared, but especially
+49:52
+to see that we want to look at how well does that model actually predict new data, because that lets us select
+49:59
+the simplest model we can that accounts for the data, but predicts new data in an effective way.
+50:06
+And that complexity can either be based on theory, in the case of Hooke, or in more likely cases,
+50:11
+by doing cross-validation to try and figure out which one is the simplest model that
+50:16
+still does a good job of predicting out of data behavior.
+50:21
+And with that, I'll see you next time.

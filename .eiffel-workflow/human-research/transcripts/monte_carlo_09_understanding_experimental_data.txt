@@ -1,0 +1,870 @@
+0:00
+The following content is provided under a Creative Commons license. Your support will help MIT OpenCourseWare
+0:06
+continue to offer high quality educational resources for free. To make a donation or to view additional materials
+0:13
+from hundreds of MIT courses, visit MIT OpenCourseWare at ocw.mit.edu.
+0:30
+ERIC GRIMSON: OK, welcome back or welcome, depending on whether you've been away or not.
+0:37
+I'm going to start with two simple announcements. There is a reading assignment for this lecture,
+0:43
+actually for the next two lectures, which is chapter 18. And on a much happier note, there
+0:50
+is no lecture Wednesday because we hope that you're going to be busy preparing to get that tryptophan poisoning
+0:56
+as you eat way too much turkey and you fall asleep. More importantly, I hope you have a great break over Thanksgiving, whether you're here
+1:02
+or you're back home or wherever you are. But no lecture Wednesday.
+1:08
+Topic for today, I'm going to start with seems like--
+1:13
+sorry, what's going to seem like a really obvious statement. We're living in a data intensive world.
+1:20
+Whether you're a scientist, an engineer, social scientist, financial worker, politician, manager of a sports team,
+1:31
+you're spending increasingly larger amounts of time dealing with data. And if you're in one of those positions,
+1:37
+that often means that you're either writing code or you're hiring somebody to write code for you
+1:43
+to figure out that data. And this section of the course is
+1:48
+focusing on exactly that issue. We want to help you understand what you can try to do with software that manipulates data, how you
+1:56
+can write code that would do that manipulation of data for you, and especially what you should believe about what
+2:02
+that software tells you about data, because sometimes it tells you stuff that isn't exactly what you need to know.
+2:10
+And today we're going to start that by looking at particularly the case where we get data from experiments.
+2:16
+So think of this lecture and the next one as sort of being statistics meets experimental science.
+2:22
+So what do I mean by that? Imagine you're doing a physics lab, biology lab, a chemistry
+2:28
+lab, or even something in sociology or anthropology, you conduct an experiment to gather some data.
+2:34
+It could be measurements in a lab. It could be answers on a questionnaire. You get a set of data.
+2:40
+Once you've got the data, you want to think about what can I do with it, and that usually will involve using some model, some theory
+2:47
+about the underlying process to generate questions about the data.
+2:53
+What does this data and the model associated with it tell me about future expectations,
+2:58
+help me predict other results that will come out of this data. In the social case, it could be how
+3:04
+do I think about how people are going to respond to a poll about who are you voting for in the next election, for example.
+3:12
+Given the data, given the model, the third thing we're typically going to want to do
+3:17
+is then design a computation to help us answer questions about the data, run a computational experiment
+3:24
+to complement the physical experiment or the social experiment we used to gather the data in the first place.
+3:30
+And that computation could be something deep. It could be something a little more interesting, depending on how you're thinking about it.
+3:37
+But we want to think about how do we use computation to run additional experiments for us.
+3:43
+So I'm going to start by using an example of gathering experimental data, and I want to start
+3:48
+with the idea of a spring. How would I model a spring? How would I gather data about a spring?
+3:54
+And how would I write software to help me answer questions about a spring? So what's spring?
+4:01
+Well, there's one kind of spring, a little hard to model, although it could be interesting what's swimming around in there
+4:06
+and how do I think about the ecological implications of that spring. Here's a second kind of spring.
+4:13
+It's about four or five months away, but eventually we'll get through this winter and get to that spring and that would be nice, but I'm not going to model that one either.
+4:20
+And yes, my jokes are really bad, and yes, you can't do a darn thing about them because I am tenured because--
+4:25
+while I'd like to model these two springs, we're going to stick with the one that you see in physics labs, these kinds of springs,
+4:33
+so-called linear springs. And these are springs that have the property that you
+4:38
+can stretch or compress them by applying a force to it. And when you release them, they literally spring back to the position they were originally.
+4:46
+So we're going to deal with these kinds of springs. And the distinguishing characteristics of these two springs and others in this class
+4:54
+is that that force you require to compress it or stretch it a certain amount--
+4:59
+the amount of force you require varies linearly in the distance.
+5:04
+So if it takes some amount of force to compress it some amount of distance, it takes twice as much force to compress it twice as much
+5:12
+of a distance. It's linearly related. So each one of these springs--
+5:18
+these kinds of springs has that property. The amount of force needed to stretch or compress it's linear in that distance.
+5:25
+Associated with these springs there is something called a spring constant-- usually represented by the number k--
+5:32
+that determines how much force do you need to stretch or compress the spring.
+5:38
+Now, it turns out that that spring constant can vary a lot. The slinky actually has a very low spring constant.
+5:45
+It's one newton per meter. That spring on the suspension of a motorcycle
+5:51
+has a much bigger spring constant. It's a lot stiffer, 35,000 newtons per meter.
+5:56
+And just in case you don't remember, a newton is the amount of force you need to accelerate a one-kilogram mass one
+6:02
+meter per second squared. We'll come back to that in a second. But the idea is we'd like to think about how do we
+6:09
+model these kinds of springs. Well, turns out, fortunately for us,
+6:15
+that that was done about 300-plus years ago by a British physicist named Robert Hooke.
+6:20
+Back in 1676 he formulated Hooke's law of elasticity.
+6:26
+Simple expression that says the force you need to compress or stretch a spring
+6:33
+is linearly related to the distance, d, that you've actually done that compression in,
+6:38
+or another way of saying it is, if I compress a spring some amount, the force that's stored in it
+6:44
+is linearly related to that distance. And the negative sign here basically says it's pointing in the opposite direction.
+6:52
+So if I compress, the force is going to push it back out. If I stretch it, the force is going to push back
+6:57
+into that resting position. Now, this law holds for a wide range of springs,
+7:06
+which is kind of nice. It's going to hold both in biological systems
+7:11
+as well as in physical systems. It doesn't hold perfectly. There's a limit to how much you can stretch,
+7:18
+in particular, a spring before the law breaks down, and maybe you did this as a kid, right. If you take a slinky and pull it too far apart,
+7:26
+it stops working because you've exceeded what's called the elastic limit of the spring. Similarly, if you compress it too far,
+7:32
+although I think you have to compress it a long ways, it'll stop working as well.
+7:38
+So it doesn't hold completely, and it also doesn't hold for all springs.
+7:44
+Only those springs that satisfy this linear law, which are a lot of them. So, for example, it doesn't apply to rubber bands,
+7:50
+it doesn't apply to recurved bows. Those are two examples of springs that do not obey this linear relationship.
+7:57
+But nonetheless, there's Hooke's law. And one of the things we can do is say, well, let's use it to do a little bit of reasoning about this spring.
+8:05
+So we can ask the question, how much does a rider have to weigh to compress this spring by one
+8:11
+centimeter? And we've got Hooke's law, and I also gave you a little bit of hint here. So I told you that this spring has a spring constant
+8:19
+of 35,000 newtons per meter. So I could just plug this in, right, one centimeter,
+8:24
+it's 1/100 of a meter times-- so that's the-- there's the spring constant.
+8:30
+There's the amount we're going to compress it. Do a little math, and that says that the force I need
+8:35
+is 350 newtons. So what's a newton? A small town in Massachusetts, an interesting cookie,
+8:43
+and a force that we want to think about. I keep telling you guys, the jokes are really bad.
+8:49
+So how do I get force? Well, you know that. Mass times acceleration, right, F equals ma.
+8:55
+For acceleration here, I'm going to make an assumption, which is that the spring is basically oriented perpendicular
+9:01
+to the earth, so that the acceleration is just the acceleration of gravity, which is roughly
+9:07
+9.8 meters per second squared. It's basically pulling it down. So I could plug that back in because remember
+9:15
+what I want to do is figure out what's the mass I need. So for the force, I'm substituting that in. I've got that expression, mass times 9.8 meters divided
+9:23
+by seconds squared is 350 newtons, divide through by 9.8 both sides, do a little bit of math.
+9:34
+And it says that the mass I need is 350 kilograms divided by 9.8.
+9:39
+And that k refers to kilograms, not to the spring constant. Poor choice of example, but there I am.
+9:46
+And if I do the math, it says I need a rider that weighs 35.68 kilos.
+9:52
+And if you're not big on the metric system, it's actually a fairly light rider. That's about 79 pounds. So a 79-pound rider would compress that spring one
+10:01
+centimeter. So we can figure out how to use Hooke's law. We're thinking about what we want to do with springs.
+10:07
+That's kind of nice. How will we actually get the spring constant?
+10:14
+It's really valuable to know what the spring constant is. And just to give you a sense of that, it's not just to deal with things like slinkies.
+10:21
+Atomic force microscopes, need to know the spring constants of the components in order to calibrate them properly.
+10:28
+The force you need to deform a strand of DNA is directly related to the spring constants
+10:34
+of the biological structures themselves. So I'd really like to figure out how do I get them.
+10:41
+How many of you have done this experiment in physics and hated it? Right. Well, I don't know if you hated it or not,
+10:47
+but you've done it, right? Standard way to do it is I'd take a spring, I suspend it from some point.
+10:52
+Let it come to a resting position. And then I put a mass on the bottom of the spring.
+10:58
+It kind of bounces around. And when it settles, I measure the distance from where it was before I put the mass
+11:04
+on to the distance of where it is after I've added the mass. I measure that distance.
+11:10
+And then I just plug in. I plug into that formula there. The force is minus k times d.
+11:17
+So k the spring constant is the force, forget the minus sign, divided by the distance, and the force here
+11:23
+would be 9.8 meters per second squared or-- kilograms per second squared times the mass divided by d.
+11:30
+So I could just plug it in. In an ideal world, I'd plug it in, I'm done, one measurement.
+11:38
+Not so much, right. Masses aren't always perfectly calibrated. Maybe the spring has got not perfect materials in it.
+11:47
+So ideally I'd actually do multiple trials. I would take different weights, put them on the spring,
+11:53
+make the measurements, and just record those. So that's what I'm going to do, and I've actually done that.
+11:58
+I'm not going to make you do it. But I get out a set of measurements.
+12:05
+What have I done here? I've used different masses, all increasing by now 0.05
+12:11
+kilograms, and I've measured the distance that the spring has deformed.
+12:17
+And ideally, these would all have that nice linear relationship, so I could just plug them in and I could figure out what the spring constant is.
+12:24
+So let's take this data and let's plot it.
+12:30
+And by the way, all the code you'll be able to see when you download the file, I'm going to walk through some of it quickly. This is a simple way to deal with it,
+12:37
+and I'm going to back up for a second. There's my data, and I actually have done this
+12:42
+in some ways the wrong order. These are my independent measures, different masses.
+12:49
+I'm going to plot those along the x-axis, the horizontal axis. These are the dependent things.
+12:55
+These are the things I'm measuring. I'm going to plot those along the y-axis. So I really should have put them in the other order.
+13:01
+So just cross your eyes and make this column go over to that column, and we'll be in good shape.
+13:06
+Let's plot this. So here's a little file. Having stored those away in a file, I'm just going to read them in, get data.
+13:13
+Just going to do the obvious thing of read in these things and return two tuples or lists, one for the x values--
+13:19
+or if you like, again going back to it, this set of values, and one for the y values.
+13:27
+Now I'm going to play a little trick that you may have seen before that's going to be handy to me. I'm going to actually call this function out
+13:34
+of the PyLab library called array. I pass in that tuple, and what it does is it converts it into an array, which
+13:41
+is a data structure that has a fixed number of slots in it but has a really nice property I want to take advantage of.
+13:48
+I could do all of this with lists. But by converting that into array and then giving it the same name xVals and similarly
+13:53
+for the yVals, I can now do math on the array without having to write loops.
+13:59
+And in particular right here, notice what I'm doing. I'm taking xVals, which is an array, multiplying it
+14:05
+by a number. And what that does is it takes every entry in the array,
+14:10
+multiplies that entry, and puts it into basically a new version of the array, which I then
+14:16
+store into xVals. If you've programmed in Matlab, this is the same kind of feeling, right.
+14:22
+I can take an array, do something to it, and that's really nice. So I'm going to scale all of my values,
+14:27
+and then I'm going to plot them out some appropriate things. And if I do it, I get that.
+14:33
+I thought we said Hooke's law was a linear relationship.
+14:43
+So in an ideal world, all of these points ought to lay along a line somewhere,
+14:49
+where the slope of the line would tell me the spring constant.
+14:54
+Not so good, right. And in fact, if you look at it, you can kind of see-- in here you can kind of imagine there's a line there,
+15:01
+something funky is going on up here. And we're going to come back to that at the end of the lecture. But how do we think about actually finding the line?
+15:11
+Well, we know there's noise in the measurement, so our best thing to do is to say, well, could we just fit a line to this data?
+15:19
+And how would we do that? And that's the first big thing we want to do today. We want to try and figure out, given
+15:24
+that we've got measurement noise, how do we fit a line to it. So how do we fit a curve to data?
+15:32
+Well, what we're basically going to try and do is find a way to relate an independent variable, which
+15:38
+were the masses, the y values, to the dependent-- sorry, wrong way.
+15:44
+The independent values, which are the x-axis, to the dependent value, what is the actual displacement we're going to see?
+15:49
+So another way of saying it is if I go back to here, I want to know for every point along here,
+15:56
+how do I fit something that predicts what the y value is? So I need to figure out how to do that fit.
+16:04
+To decide-- even if I had a curve, a line that I thought was a good fit to that, I
+16:09
+need to decide how good it is. So imagine I was lucky and somebody said, here's a line that I think describes
+16:15
+Hooke's law in this case. Great. I could draw the line on that data. I could draw it on this chunk of data here.
+16:22
+I still need to decide how do I know if it's a good fit. And for that, we need something we call an objective function,
+16:31
+and it's going to measure how close is the line to the data to which I'm trying to fit it.
+16:36
+Once we've defined the objective function, then what we say
+16:44
+is, OK, now let's find the line that minimizes it, the best possible line, the line that makes that objective
+16:50
+function as small as possible, because that's going to be the best fit to the data. And so that's what I'd like to do.
+16:57
+We're going to see-- we're going to do it for general curves, but we're going to start just with lines, with linear function.
+17:03
+So in this case, we want to say what's the line such that some function of the sum of the distances from the line to the measured points
+17:10
+is minimized. And I'm going to come back in a second to how do we find the line. But first we've got to think about what does it mean to measure it.
+17:16
+So I've got a point. Imagine I got a line that I think
+17:22
+is a good match for the thing fitting the data. How do I measure distance?
+17:28
+Well, there's one option. I could measure just the displacement along the x-axis.
+17:35
+There's a second option. I could measure the displacement vertically. Or a third option is I could actually measure the distance
+17:43
+to the closest point on the line, which would be that perpendicular distance there.
+17:50
+You're way too quiet, which is always dangerous. What do you think? I'm going to look for a show of hands here. How many people think we should use x as the thing
+17:57
+that we measure here? Hands up. Please don't use a single finger when you put your hand up.
+18:02
+All right. Good. How many people think we should use p, the perpendicular distance?
+18:09
+Reasonable number of hands. And how about y? And I see actually about split between p and y.
+18:15
+And that's actually really good. X doesn't make a lot of sense, right, because I know that my values along the x-axis
+18:23
+are independent measurements. So the displacement in that direction doesn't make a lot of sense.
+18:29
+P makes a lot of sense, but unfortunately isn't what I want. We're going to see examples later
+18:35
+on where, in fact, minimizing things where you minimize that distance is the right thing to do. When we do machine learning, that
+18:41
+is how you find what's called a classifier or a separator. But actually here we're going to pick y,
+18:47
+and the reason is important. I'm trying to predict the dependent value, which
+18:53
+is the y value, given an independent new x value. And so the displacement, the uncertainty
+19:00
+is, in fact, the vertical displacement. And so I'm going to use y. That displacement is the thing I'm going
+19:06
+to measure as the distance.
+19:12
+How do I find this? I need an objective function that's going to tell me what is the closeness of the fit.
+19:18
+So here's how I'm going to do it. I'm going to have some set of observed values. Think of it as an array.
+19:25
+I've got some index into them, so the indices are giving me the x values. And the observed values are the things I've actually measured.
+19:31
+If you want to think of it this way, I'm going to go back to this slide really quickly. The observed values are the displacements
+19:37
+or the values along the y-axis. Sorry about that.
+19:42
+Let's assume that I have some hypothesized line that I
+19:49
+think fits this data, y equals ax plus b. I know the a and the b. I've hypothesized it.
+19:55
+Then predicted will basically say given the x value, the line predicts here's what the y value should be.
+20:04
+And so I'm going to take the difference between those two and square them.
+20:09
+So the difference makes sense. It tells me how far away is the observed value from what the line predicts it should be.
+20:15
+Why am I squaring it? Well, there are two reasons. The first one is that squaring is going to get rid of the sign.
+20:20
+It shouldn't matter if my observed value is some amount above the predicted value or some amount below-- the same amount
+20:27
+below the predicted value. The displacement in direction shouldn't matter. It's how far away is it.
+20:33
+Now, you could say, well, why not just use absolute value? And the answer is you could, but we're
+20:38
+going to see in a couple of slides that by using the square we get a really nice property that helps
+20:43
+us find the best fitting line. So my objective function here basically says,
+20:50
+given a bunch of observed values, use the hypothesized line to predict what the value should be, measure the difference in the y direction--
+20:57
+which is what I'm doing because I'm measuring predicted and observed y values-- square them, sum them all up.
+21:02
+It's called least squares. That's going to give me a measure of how close that line is to a fit.
+21:09
+In a second, I'll get to how you find the best line. But this hopefully looks familiar.
+21:17
+Anybody recognize this? You've seen it earlier in this class. Boy, that's a terrible thing to ask because you don't even
+21:24
+remember the last thing you did in this class other than the problem set. AUDIENCE: [INAUDIBLE] ERIC GRIMSON: Sorry?
+21:29
+AUDIENCE: Variance. ERIC GRIMSON: Variance. Thank you. Absolutely. Sorry, I didn't bring any candy today. That's Professor Guttag.
+21:34
+I got a better arm than he does, but I still didn't bring any candy today. Yeah, it's variance, not quite.
+21:40
+It's almost variance. That's the variance times the number of observations, or another way of saying it is if I divided this
+21:46
+by the number of observations, that would be the variance. If I took the square root, it would be the standard deviation.
+21:52
+Why is that valuable? Because that tells you something about how badly things
+21:57
+are dispersed, how much variation there is in this measurement. And so if it says, if I can minimize this expression,
+22:05
+that's great because it not only will find what I hope is the best fit, but it's going to minimize the variance between what I predict
+22:12
+and what I measure, which makes intuitive sense. That's exactly the thing I would like to minimize.
+22:18
+This was built on the assumption that I
+22:23
+had a line that I thought was a good fit, and this lets me measure how good a fit I have.
+22:29
+But I still have to do a little bit more. I have to now figure out, OK, how do I find the best-fitting line?
+22:36
+And for that, we need to come up with a minimization technique. So to minimize this objective function,
+22:42
+I want to find the curve for the predicted values-- this thing here-- some way of representing that that leads
+22:48
+to the best possible solution. And I'm going to make a simple assumption.
+22:54
+I'm going to assume that my model for this predicted curve-- I've been using the example of a line,
+23:00
+but we're going to say curve-- is a polynomial. It's a polynomial and one variable. The one variable is what are the x values of the samples.
+23:09
+And I'm going to assume that the curve is a polynomial. In the simplest case, it's a line in case order, and two,
+23:15
+it's going to be a parabola. And I'm going to use a technique called linear regression to find the polynomial that best fits the data, that minimizes
+23:23
+that objective function. Quick aside, just to remind you, I'm sure you remember,
+23:29
+so polynomial-- polynomials, either the value is zero, which is really boring, or it is a finite sum of non-zero terms
+23:38
+that all have the form c times x to the p. C is a constant, a real number.
+23:45
+P is a power, a non-negative integer. And this is basically-- x is the free variable that's going to capture this.
+23:50
+So easy way to say it is a line would be represented as a degree one polynomial ax plus b.
+23:57
+A parabola is a second-degree polynomial, ax squared plus bx plus c. And we can go up to higher order terms.
+24:05
+We're going to refer to the degree of the polynomial as the largest degree of any term in that polynomial.
+24:10
+So again, degree one, linear degree two, quadratic. Now how do I use that?
+24:17
+Well, here's the basic idea. Let's take a simple example. Let's assume I'm still just trying to fit a line.
+24:22
+So my assumption is I want to find a degree one polynomial, y equals ax plus b, as our model of the day.
+24:30
+That means for every sample, I'm going to plug in x, and if I know a and b, it gives me the predicted value.
+24:37
+I've already seen that's going to give me a good measure of the closeness of the fit. And the question is, how do I find a and b.
+24:44
+My goal is find a and b such that when
+24:50
+we use this polynomial to compute those y values, that sum squared difference is minimized.
+24:57
+So the sum squared difference is my measure of fit. All I have to do is find a and b.
+25:03
+And that's where linear regression comes in, and I want to just give you a visualization of this.
+25:09
+If a line is described by ax plus b, then I can represent every possible line
+25:15
+in a two-dimensional space. One axis is possible values for a.
+25:21
+The other axis is possible values for b. So if you think about it, I take any point in that space. It gives me an a and a B value.
+25:27
+That describes a line. Why should you care about that? Because I can put a two-dimensional surface
+25:35
+over that space. In other words, for every a and b, that gives me a line, and I could, therefore, compute this function,
+25:43
+given the observed values and the predicted values, and it would give me a value, which is the height of the surface in that space.
+25:50
+If you're with me with the visualization, why is that nice? Because linear regression gives me a very easy way
+25:57
+to find the lowest point on that surface, which is exactly the solution I want, because that's the best fitting line.
+26:03
+And it's called linear regression not because we're solving for a line, but because of how you do that solution.
+26:10
+If you think of this as being-- take a marble on this two-dimensional surface, you want to place the marble on it,
+26:15
+you want to let it run down to the lowest point in the surface. And oh, yeah, I promised you why do we use sum squares,
+26:22
+because if we used the sum of the squares, that surface always has only one minimum.
+26:28
+So it's not a really funky, convoluted surface. It has exactly one minimum. It's called linear regression because the way
+26:34
+to find it is to start at some point and walk downhill. I linearly regress or walk downhill along the gradient
+26:41
+some distance, measure the new gradient, and do that until I get down to the lowest point in the surface.
+26:49
+Could you write code to do it? Sure. Are we going to ask you to do it? No, because fortunately--
+26:57
+I was hoping to get a cheer out of that. Too bad. OK, maybe we will ask you to do it on the exam. What the hell.
+27:03
+You could do it. In fact, you've seen a version of this. The typical algorithm for doing it is very similar to Newton's method
+27:10
+that we used way back in the beginning of 60001 when we found square roots.
+27:15
+You could write that kind of a solution, but the good news is that the nice people who wrote Python, or particularly PyLab,
+27:21
+have given you code to do it. And we're going to take advantage of it. So in PyLab there is a built-in function called polyFit.
+27:30
+It takes a collection of x values, takes a collection of equal length of y values-- they need to be the same length.
+27:36
+I'm going to assume they're arrays. And it takes an integer n, which is the degree of fit,
+27:43
+that I want to apply. And what polyFit will do is it will find the coefficients of a polynomial of that degree that
+27:50
+provides the best least squares fit. So think of it as polyFit walking along
+27:55
+that surface to find the best a and b that will come back. So if I give it a value of n equals one,
+28:01
+it'll give me back the a and b that gives me the best line. If I get a value of n equal two, it gives me back a, b, and c that would
+28:07
+fit an ax squared plus bx plus c parabola to best fit the data. And I could pick n to be any non-negative integer,
+28:14
+and it would actually come up with a good fit.
+28:20
+So let's use it. I'm going to write a little function called fitData.
+28:25
+The first part up here just comes from plotData. It's exactly the same thing. I read in the data. I convert them into arrays.
+28:31
+I convert this because I want to get out the force. I go ahead and plot it. And then notice what I do, I use polyFit right here
+28:38
+to take the inputted x values and y values and a degree one, and it's going to give me back a tuple,
+28:45
+an a and a b that are the best fit line. Finds that point in the space that best fits it.
+28:51
+Once I've got that, I could go ahead and actually compute now what are the estimated or predicted values.
+28:58
+The line's going to tell me what I should have seen as those values, and I'm going to do the same thing. I'm going to take x values, convert it into array,
+29:04
+multiply it by a, which says every entry in the array is scaled by a. Add b to every entry.
+29:11
+So I'm just computing ax plus b for all possible x's. And that then gives me an estimated set of y values,
+29:18
+and I can plot those out. I'm cheating here. Sorry.
+29:23
+I'm misdirecting you. I never cheat. I actually don't need to do the conversion to an array
+29:29
+there because I did it up here. But because I've borrowed this from plot lab, I wanted to show you that I can redundantly
+29:35
+do it here to remind you that I want to convert it into array to make sure I can do that kind of algebra on it.
+29:41
+The last thing I could do is say even if I can-- once I show you the fit of this line,
+29:47
+I also want to get out the spring constant. Now, the slope of this line is difference in force
+29:53
+over difference in distance. The spring constant is the opposite of it. So I could simply take the slope of the line, which
+30:00
+is a, invert it, and that gives me the spring constant.
+30:06
+So let's see what happens if we actually run this. So I'm going to go over to my code, hoping that it works properly.
+30:12
+Here's my Python. I've loaded this in.
+30:17
+I'm going to run it. And there you go. Fits a line, and it prints out the value
+30:25
+of a, which is about 0.46, and the value of b. And if I go back and look at this,
+30:38
+there we go, spring constant is about 21 and a half, which is about the reciprocal of 0.046
+30:43
+if you can figure that out. And you can see, it's not a bad fit to a line through that data.
+30:49
+Again, there's still something funky going on over here that we're going to come back to. But it's a pretty good fit to the data.
+30:56
+Great. So now I've got a fit. I'm going to show you a variation of this
+31:02
+that we're going to use in a second. I could do the same thing, but after I've done polyFit here, I'm going to use another built-in function called
+31:08
+polyval. It's going to take a polynomial, which is captured by that model of the thing that I returned,
+31:14
+and I'm going to show you the difference again. Back sure we returned this as a tuple.
+31:19
+Since it's coming back as a tuple, I can give it a name model. Polyval will take that tuple plus the x values
+31:26
+and do the same thing. It will give me back an array of predicted values. But the nice thing here is that this model could be a line.
+31:34
+It could be a parabola. It could be a quartic. It could be a quintic. It could be any order polynomial.
+31:41
+If you like the abstraction here-- which we're going to see in a little bit, that it allows me to use the same code
+31:47
+for different orders of model. And if I ran this, it would do exactly the same thing.
+31:54
+I'm going to come back to thinking about what's going on in that spring in a second. But I want to show you another example.
+32:01
+So here's another set of data. In a little bit, I'll show you where that mystery data came from.
+32:06
+But here's another set of data that I've plotted out. I could run the same thing. I could run exactly the same code and fit a line to it.
+32:14
+And if I do it, I get that. What do you think?
+32:20
+Good fit? Show of hands, how many people like this fit to the data?
+32:25
+Show of hands, how many people don't like this fit to the data? Show of hands, how many hope that I'll stop asking you questions?
+32:31
+Don't put your hands up. Yeah, thank you. I know. Too bad. It's a lousy fit.
+32:37
+And you kind of know it, right. It's clear that this doesn't look like it's coming from a line, or if it is, it's a really noisy line.
+32:45
+So let's think about this. What if I were to try a higher order degree.
+32:51
+Let's change the one to a two. So I'm going to come back to it in a second. I've changed the one to a two.
+32:57
+That says I'm still using the polynomial fit, but now I'm going to ask what's the best fitting parabola, ax
+33:04
+squared plus bx plus c. Simple change. Because I was using polyval, exactly the same code
+33:12
+will work. It's going to do the fit to it. This is, by the way, still an example of linear regression.
+33:19
+So think of what I'm doing now. I have a three-dimensional space.
+33:24
+One axis is a values. Second axis is b values. Third axis is c values.
+33:30
+Any point in that space describes a parabola, and every point in that space describes
+33:36
+every possible parabola. And now you've got to twist your head a little bit. Put a four-dimensional surface on
+33:42
+that three-dimensional basis, where the point in that surface is the value of that objective function.
+33:48
+Play the same game. And you can. It's just a higher-dimensional thing. So you're, again, going to walk down the gradient
+33:54
+to find the solution, and be glad you don't have to write this code because PyLab will do it for you freely. But it's still an example of regression, which is great.
+34:04
+And if we do that, we get that fit. Actually just to show you that, I'm going to run it,
+34:09
+but it will do exactly the same thing. If I go over to Python--
+34:15
+wherever I have it here-- I'm going to change that order of the model.
+34:23
+Oops, it went a little too far for me. Sorry about that. Let me go back and do this again.
+34:29
+There's the first one, and there's the second one.
+34:35
+So I could fit different models to it.
+34:44
+Quadratic clearly looks like it's a better fit. I hope you'll agree.
+34:49
+So how do I decide which one's better other than eyeballing it?
+34:55
+And then if I could fit a quadratic to it, what about other orders of polynomials? Maybe there's an even better fit out there.
+35:01
+So how do I figure out what's the best way to do the fit? And that leads to the second big thing for this lecture.
+35:08
+How good are these fits? What's the first big thing? The idea of linear regression, a way of finding
+35:14
+fits of curves to data. But now I've got to decide how good are these. And I could ask this question two ways.
+35:21
+One is just relative to each other, how do I measure which one's better other than looking at it by eye?
+35:27
+And then the second part of it is in an absolute sense, how do I know where the best solution is?
+35:33
+Is quadratic the best I could do? Or should I be doing something else to try and figure out a better solution, a better
+35:38
+fit to the data? The relative fit.
+35:44
+What are we doing here? We're fitting a curve, which is a function of the independent variable to the dependent variable.
+35:51
+What does it mean by that? I've got a set of x values. I'm trying to predict what the y values should be, the displacement should be.
+35:57
+I want to get a good fit to that. The idea is that given an independent value, it gives me an estimate of what it should be,
+36:03
+and I really want to know which fit provides the better estimates. And since I was simply minimizing mean squared error,
+36:10
+average square error, an obvious thing to do is just to use the goodness of fit by looking at that error.
+36:17
+Why not just measure where am I on that surface and see which one does better? Or actually it would be two surfaces,
+36:22
+one for a linear fit, one for a quadratic one. We'll do what we always do.
+36:28
+Let's write a little bit of code. I can write something that's going to get the average, mean squared error. Takes in a set of data points, a set of predicted values,
+36:36
+simply measures the difference between them, squares them, adds them all up in a little loop here and returns that divided by the number of samples I have.
+36:42
+So it gives me the average squared error. And I could do it for that first model I built, which was for a linear fit, and I
+36:49
+could do it for the second model I built, which is a quadratic fit. And if I run it, I get those values.
+36:57
+Looks pretty good. You knew by eye that the quadratic was a better fit. And look, this says it's about six times better,
+37:05
+that the residual error is six times smaller with the quadratic model than it is the linear model.
+37:11
+But with that, I still have a problem, which is--
+37:19
+OK, so it's useful for comparing two models. But is 1524 a good number?
+37:26
+Certainly better than 9,000-something or other. But how do I know that 1524 is a good number?
+37:31
+How do I know there isn't a better fit out there somewhere? Well, good news is we're going to be able to measure that.
+37:37
+It's hard to know because there's no bound on the values. And more importantly, this is not scale independent.
+37:44
+What do I mean by that? If I take all of the values and multiply them by some factor,
+37:49
+I would still fit the same models to them. They would just scale. But that measure would increase by that amount.
+37:56
+So I could make the error as big or as small as I want by just changing the size of the values. That doesn't make any sense.
+38:02
+I'd like a way to measure goodness of fit that is scale independent and that tells me
+38:08
+for any fit how close it comes to being the perfect fit to the data.
+38:14
+And so for that, we're going to use something called the coefficient of determination written as r squared.
+38:20
+So let me show you what this does, and then we're going to use it. The y's are measured values.
+38:26
+Those are my samples I got from my experiment. The p's are the predicted values. That is, for this curve, here's what I
+38:34
+predict those values should be. So the top here is basically measuring as we saw before the sum squared error in those pieces.
+38:42
+Mu down here is the average, or mean, of the measured values. It's the average of the y's.
+38:48
+So what I've got here is in the numerator-- this is basically the error in the estimates from my curve
+38:56
+fit. And in the denominator I've got the amount of variation
+39:01
+in the data itself. This is telling me how much does the data change from just being
+39:07
+a constant value, and this is telling me how much do my errors vary around it.
+39:13
+That ratio is scale independent because it's a ratio. So even if I increase all of the values by some amount, that's going to divide out,
+39:19
+which is kind of nice. So I could compute that, and there it is.
+39:25
+R squared is, again, that expression. I'll take in a set of observed values, a set of predicted values, and I'll measure the error--
+39:32
+again, these are arrays. So I'm going to take the difference between the arrays. That's going to give me piecewise or pairwise
+39:37
+that difference. I'll square it. That's going to give me at every point in the array the square of that distance.
+39:43
+And then because it's an array, I can just use the built-in sum function to add them all up. So this is going to give me the--
+39:48
+if you like, the values up there. And then I'm going to play a little trick.
+39:54
+I'm going to compute the mean error, which is that thing divided by the number of observations.
+40:00
+Why would I do that? Well, because then I can compute this really simply.
+40:05
+I could write a little loop to compute it. But in fact, I've already said what is that? If I take that sum and divide it by the number of samples,
+40:14
+that's the variance. So that's really nice. Right here I can say, get the variance
+40:19
+using the non-p version of the observed data. And because that has associated with it division
+40:27
+by the number of samples, the ratio of the mean error to the variance is exactly the same as the ratio of that to that.
+40:35
+Little trick. It lets me save doing a little bit of computation. So I can compute r squared values.
+40:40
+So what does r squared actually tell us?
+40:47
+What we're doing is we're trying to compare the estimation errors, the top part, with the variability
+40:53
+in the original values, the bottom part. So r squared, as you're going to see there, it's intended to capture what portion
+41:00
+of the variability in the data is accounted for by my model.
+41:05
+My model's a really good fit. It should account for almost all of that data.
+41:10
+So what we see then is if we do a fit with a linear regression, r squared is always going to be between zero and one.
+41:19
+And I want to just show you some examples. If r squared is equal to one, this is great.
+41:24
+It says the model explains all of the variability in the data. And you can see it if we go back here.
+41:31
+How do we make r squared equal to one? We need this to be zero, which says that the variability in the data is perfectly
+41:38
+predicted by my model. Every point lies exactly along the curve. That's great.
+41:47
+Second option at the other extreme is if r squared is equal to zero, you basically got bupkis, which is a well-known technical term,
+41:54
+meaning there's no relationship between the values predicted by the model and the actual data.
+42:00
+That basically says that all of the variability here is exactly the same as all the variability in the data.
+42:06
+The model doesn't capture anything, and it's making this one, which is making the whole thing zero.
+42:12
+And then in between an r squared of about a half says you're capturing about half the variability. So what you would like is a system
+42:18
+in which your fit is as close to an r squared value of one as possible because it says my model is
+42:24
+capturing all the variability in the data really well.
+42:31
+So two functions that will do this for us. We're going to come back to these in the next lecture. The first one called generate fits, or genFits,
+42:38
+will take a set of x values, a set of y values, and a list or a tuple of degrees,
+42:43
+and these will be the different degrees of models I'd like to fit. I could just give it one.
+42:48
+I could give it two. I could give a 1, 2, 4, 8, 16, whatever. And I'll just run through a little loop
+42:54
+here where I'm going to build up a set of models for each degree-- or d in degrees. I'll do the fit exactly as I had before.
+43:00
+It's going to return a model, which is a tuple of coefficients. And I'm going to store that in models and then return it.
+43:07
+And then I'm going to use that, because in testFits I will take the models that come from genFits,
+43:13
+I'll take the set of degrees that I also passed in there as well as the values. I'll plot them out, and then I'll
+43:19
+simply run through each of the models and generate a fit,
+43:25
+compute the r squared value, plot it, and then print out some data.
+43:31
+With that in mind, let's see what happens if we run this.
+43:37
+So I'm going to take, again, that example of that data that I started with,
+43:43
+assuming I picked the right one here, which I think is this one. I'm going to do a fit with a degree one and a degree
+43:49
+two curve. So I'm going to fit the best line. I'm going to fit the best quadratic, the best parabola,
+43:55
+and I want to see how well that comes out. So I do that.
+44:00
+I got some data there. Looks good. And what does the data tell me? Data says, oh, cool--
+44:09
+I know you don't believe it, but it is because notice what it says, it says the r squared value for the line is horrible.
+44:17
+It accounts for less than 0.05% of the data.
+44:24
+You could say, OK, I can see that. I look at it. It does a lousy job. On the other hand, the quadratic is really pretty good.
+44:31
+It's accounting for about 84% of the variability in the data. This is a nice high value.
+44:37
+It's not one, but it's a nice high value. So this is now reinforcing what I already knew, but in a nice way.
+44:44
+It's telling me that that r squared value tells me that the quadratic is a much better fit than the linear fit
+44:51
+was. But then you say maybe, wait a minute.
+44:57
+I could have done this by just comparing the fits themselves. I already saw that.
+45:03
+Part of my goal is how do I know if I've got the best fit possible or not.
+45:08
+So I'm going to do the same thing, but now I'm going to run it with another set of degrees.
+45:16
+I'm going to go over here. I'm going to take exactly the same code. But let's try it with a quadratic,
+45:23
+with a quartic, an order eight, and an order 16 fit. So I'm going to take different size polynomials.
+45:30
+As a quick aside, this is why I want to use the PyLab kind of code because now I'm
+45:35
+simply optimizing over a 16-dimensional space. Every point in that 16-dimensional space
+45:41
+defines a 16th-degree polynomial. And I can still use linear regression, meaning walking down the gradient,
+45:47
+to find the best solution. I'm going to run this.
+45:53
+And I get out a set of values. Looks good. And let's go look at them.
+45:58
+46:03
+Here is the r squared value for quadratic, about 84%.
+46:08
+Degree four does a little bit better. Degree eight does a little bit better. But wow, look at that, degree 16--
+46:16
+16th order polynomial does a really good job, accounts for almost 97% of the variability in the data.
+46:26
+That sounds great. Now, to quote something that your parents probably
+46:31
+said to you when you were much younger, just because something looks good doesn't mean we should do it.
+46:37
+And in fact, just because this has a really high r squared value doesn't mean that we want to use the order
+46:44
+16th polynomial. And I will wonderfully leave you waiting in suspense
+46:49
+because we're going to answer that question next Monday. And with that, I'll let you out a few minutes early. Have a great Thanksgiving break.
+46:57

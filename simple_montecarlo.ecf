@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<system xmlns="http://www.eiffel.com/developers/xml/configuration/22" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration/22 http://www.eiffel.com/developers/xml/configuration/22/configuration.xsd" name="simple_montecarlo" uuid="D92B0D3A-F123-4567-89AB-CDEF01234567">
+	<description>
+		Monte Carlo simulation framework for Eiffel
+		Semantic API for non-statistician engineers
+		Phase 1: Sequential MVP with simple_probability integration
+	</description>
+
+	<target name="simple_montecarlo">
+		<root class="TEST_APP" feature="make"/>
+		<option is_attached_by_default="true" void_safety="all">
+			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
+		</option>
+		<setting name="inlining_size" value="0"/>
+		<setting name="inlining" value="false"/>
+		<setting name="total_order_on_reals" value="true"/>
+		<capability>
+			<concurrency support="scoop"/>
+			<void_safety support="all"/>
+		</capability>
+
+		<!-- Library targets -->
+		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
+		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf"/>
+
+		<!-- Project source files -->
+		<cluster name="src" location="src" recursive="true">
+			<file_rule>
+				<exclude>/EIFGENs$</exclude>
+				<exclude>/.git$</exclude>
+				<exclude>/.svn$</exclude>
+			</file_rule>
+		</cluster>
+
+		<!-- Test files -->
+		<cluster name="test" location="test" recursive="true">
+			<file_rule>
+				<exclude>/EIFGENs$</exclude>
+				<exclude>/.git$</exclude>
+				<exclude>/.svn$</exclude>
+			</file_rule>
+		</cluster>
+	</target>
+
+	<target name="simple_montecarlo_lib" extends="simple_montecarlo">
+		<description>Library target for reuse</description>
+		<root class="ANY" feature="default_create"/>
+		<option>
+			<assertions precondition="true" postcondition="true" check="true" invariant="true" supplier_precondition="true"/>
+		</option>
+		<cluster name="test" location="test">
+			<file_rule>
+				<exclude>/.*</exclude>
+			</file_rule>
+		</cluster>
+	</target>
+
+</system>

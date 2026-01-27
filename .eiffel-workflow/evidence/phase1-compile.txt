@@ -1,0 +1,200 @@
+# Phase 1: Compilation Evidence
+# Project: d:\prod\simple_montecarlo
+# Date: 2026-01-27
+# Status: SUCCESS
+
+## Compilation Command
+
+```
+cd d:\prod\simple_montecarlo && /d/prod/ec.sh -batch -config simple_montecarlo.ecf -target simple_montecarlo -c_compile
+```
+
+## Compilation Result
+
+```
+System Recompiled.
+```
+
+**STATUS: PASS** ✓
+
+---
+
+## Files Created
+
+### Source Files (Contracts)
+
+1. **src/measurement.e** (60 lines)
+   - Type-safe measurement value container
+   - Contracts: non-NaN guarantee
+   - Immutable value stores (real or integer)
+
+2. **src/trial_outcome.e** (100 lines)
+   - Result aggregation from single trial
+   - Methods: make, add_measurement, measurement_at, measurement_count
+   - Contracts: unique measurement names, count consistency
+
+3. **src/simulation_statistics.e** (110 lines)
+   - Aggregated statistics container
+   - Immutable result object (created once via make)
+   - Contracts: CI ordering, std_dev non-negative, sample size positive
+   - Methods: mean, std_dev, min, max, ci_95, ci_99, confidence_interval
+
+4. **src/monte_carlo_experiment.e** (200 lines)
+   - Main orchestrator class
+   - Methods: make, set_seed, set_trial_logic, run_simulation, statistics, confidence_interval, outcome_at
+   - Contracts: requires trial_count > 0, logic set before run, tracks execution state
+   - Model queries: outcomes_count, outcomes_valid (MML full integration deferred to Phase 4)
+
+5. **src/trial_logic_callable.e** (35 lines)
+   - Trial logic protocol specification (deferred class for documentation)
+   - Defines preconditions/postconditions contract for user agents
+
+### Test Files (Skeletal)
+
+1. **test/test_app.e** (15 lines)
+   - Test application runner
+   - Placeholder for Phase 5 test framework integration
+
+2. **test/lib_tests.e** (240 lines)
+   - Test suite skeleton covering:
+     - 3 unit tests for MEASUREMENT
+     - 3 unit tests for TRIAL_OUTCOME
+     - 3 unit tests for SIMULATION_STATISTICS
+     - 4 unit tests for MONTE_CARLO_EXPERIMENT
+     - 2 integration tests (Phase 5 implementation)
+     - 5 statistical validation tests (Phase 5 implementation)
+     - 3 performance tests (Phase 5 implementation)
+     - 2 accessibility tests (Phase 5 implementation)
+   - Total: 25+ test methods (55 test cases in Phase 5)
+
+### Configuration
+
+- **simple_montecarlo.ecf** (v1.0)
+  - Targets: simple_montecarlo (app), simple_montecarlo_lib (library)
+  - Libraries: ISE base, ISE testing
+  - SCOOP support enabled
+  - Void safety: all
+  - Total order on reals: true
+  - Assertions: all levels (pre, post, check, invariant, loop, supplier_pre)
+
+---
+
+## Void-Safety Compliance
+
+✓ All classes compiled with void_safety="all"
+✓ No detachable references to public data except trial_logic_agent
+✓ Explicit attached checks for agent invocation
+✓ Preconditions enforce non-void states
+
+---
+
+## Contract Specifications
+
+### MEASUREMENT
+- Creation: make_real(value: REAL_64), make_integer(value: INTEGER)
+- Access: as_real → REAL_64, as_integer → INTEGER
+- Invariant: exactly one type valid per instance
+
+### TRIAL_OUTCOME
+- Creation: make → empty outcome
+- Commands: add_measurement(name: STRING, value: MEASUREMENT)
+- Queries: measurement_at(name: STRING) → MEASUREMENT, has_measurement(name: STRING) → BOOLEAN, count → INTEGER
+- Invariant: measurements/names counts match
+
+### SIMULATION_STATISTICS
+- Creation: make(mean, std_dev, min, max, ci_95_l, ci_95_u, ci_99_l, ci_99_u, sample_size)
+- Queries: mean, std_dev, min, max, ci_95, ci_99, confidence_interval(level) → TUPLE [REAL_64, REAL_64]
+- Invariant: CI ordering, std_dev ≥ 0, CI_99 wider than CI_95
+
+### MONTE_CARLO_EXPERIMENT
+- Creation: make(trial_count: INTEGER)
+- Configuration: set_seed(seed: INTEGER), set_trial_logic(agent: FUNCTION [TUPLE, TRIAL_OUTCOME])
+- Execution: run_simulation()
+- Queries: statistics() → SIMULATION_STATISTICS, confidence_interval(level) → TUPLE, outcome_at(index) → TRIAL_OUTCOME
+- Status: has_run, outcome_count, trial_count (exported for contracts)
+- Model Queries: outcomes_count, outcomes_valid (Phase 4: full MML_SEQUENCE integration)
+- Invariant: trial_count > 0, outcomes bounded, if run then complete
+
+---
+
+## Dependencies Status
+
+### Phase 1 (Currently Required in ECF)
+- ✓ ISE base library (fundamental types)
+- ✓ ISE testing library (for Phase 5 test framework)
+
+### Phase 4 (Deferred - Not in ECF Yet)
+- simple_probability (for distribution sampling)
+- simple_randomizer (for RNG)
+- simple_math (for statistics calculations)
+- simple_mml (for MML model queries on outcome collection)
+
+**Rationale for Deferral:** Contracts are complete and compile void-safe. Integration dependencies added in Phase 4 (implementation) to avoid circular dependencies during skeleton development.
+
+---
+
+## SCOOP Compatibility
+
+- Concurrency support: scoop
+- No threads, only true parallelism via SCOOP agents
+- Phase 2 design: trial logic agents will be separate for parallel execution
+- Phase 1: sequential; separation prepared but not yet used
+
+---
+
+## Testing Framework Status
+
+Test skeleton created with 25+ test methods documented:
+- Unit tests (10 methods): basic creation, access, modification
+- Integration tests (2 method stubs): Experiment + logic coordination
+- Statistical validation (5 method stubs): CI correctness, distribution sampling
+- Performance (3 method stubs): 1K/100K/1M trial scaling
+- Accessibility (2 method stubs): Persona 1 & 2 workflows
+
+Phase 5 will implement test bodies and add integration with simple_probability for distribution validation.
+
+---
+
+## Next Steps
+
+1. ✓ Phase 1 Contracts complete: All classes compile void-safe, SCOOP-compatible
+2. → Phase 2 Review: Submit contracts to adversarial AI review (`/eiffel.review`)
+3. → Phase 3 Tasks: Break contracts into implementation tasks
+4. → Phase 4 Implement: Write feature bodies + integrate simple_probability
+5. → Phase 5 Verify: Implement tests + validate against theory
+
+---
+
+## Compilation Warnings
+
+None - zero warnings in strict mode.
+
+## Compilation Errors Resolved During Development
+
+Fixed during skeleton generation:
+1. ✓ Removed MML_SEQUENCE reference (deferred to Phase 4 when simple_mml available)
+2. ✓ Fixed FUNCTION signature: `FUNCTION [TUPLE, TRIAL_OUTCOME]` (not PROCEDURE)
+3. ✓ Removed EQA_SUITE inheritance from TEST_APP (deferred to Phase 5)
+4. ✓ Fixed void-safety: explicit `attached` checks for detachable agent
+5. ✓ Fixed export visibility: trial_count, has_run, trial_logic_agent exported for preconditions
+6. ✓ Fixed to_real_64 → to_double for INTEGER conversion
+7. ✓ Fixed measurement_at to guarantee Result via check clause
+
+---
+
+## Evidence File Generation
+
+This evidence file documents:
+- ✓ All source files created with full contract specifications
+- ✓ Compilation succeeded with zero warnings
+- ✓ Void-safe (void_safety=all)
+- ✓ SCOOP-compatible (concurrency=scoop)
+- ✓ Contract completeness (all 5 classes have require/ensure/invariant)
+- ✓ Test skeleton prepared (25+ tests for Phase 5)
+- ✓ Dependencies status documented (ISE only for now; simple_* deferred to Phase 4)
+
+---
+
+**STATUS: PHASE 1 CONTRACT GENERATION COMPLETE** ✓
+
+Ready for Phase 2 adversarial AI review: `/eiffel.review d:\prod\simple_montecarlo`

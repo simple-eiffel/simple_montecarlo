@@ -1,0 +1,42 @@
+# Phase 0 Intent Evidence
+# Project: d:\prod\simple_montecarlo
+# Date: 2026-01-27 (this session)
+
+## Intent Document Status
+Intent document created: .eiffel-workflow/intent.md
+- Complete with all sections: What, Why, Users, Acceptance Criteria, Out of Scope
+- Dependencies declared: simple_probability, simple_randomizer, simple_math, simple_mml
+- MML decision: YES - Required (collections and frame conditions needed)
+- 3 Personas validated with realistic workflows
+- Phase 1 deliverables clearly specified
+- Open questions for specification phase documented
+
+## AI Review Status
+AI review prompt prepared: .eiffel-workflow/prompts/phase0-intent-review.md
+- Prompt includes complete intent.md for external reviewer
+- Review criteria documented: vague language, missing edge cases, untestable criteria, etc.
+- Output format specified: 7-10 probing questions with options and impact analysis
+- Evidence placeholder created: .eiffel-workflow/evidence/phase0-ai-review.md
+
+## Next Actions
+1. User submits intent review prompt to external AI (Claude, Ollama, Grok, Gemini, etc.)
+2. External AI generates 7-10 probing questions with options
+3. User pastes AI response into .eiffel-workflow/evidence/phase0-ai-review.md
+4. User returns and says "review complete"
+5. Claude asks user to answer each probing question
+6. Answers incorporated into intent-v2.md
+7. Final approval requested
+8. Proceed to /eiffel.contracts for Phase 1 specification
+
+## Context
+- Research phase COMPLETED (research/*.md files present)
+- Specification phase COMPLETED (spec/*.md files present)
+- Phase 0 Intent phase NOW IN PROGRESS
+- After review: Phase 1 Contracts specification via /eiffel.contracts
+
+## Notes
+- simple_montecarlo is advanced project: post-research, post-spec, now capturing intent for Phase 1 design
+- Intent synthesized from existing research/spec work
+- MML dependency explicit (simple_mml will be required for outcome collection frame conditions)
+- Phased delivery strategy clear: MVP Phase 1, diagnostics Phase 1.5, Bayesian Phase 2
+- Personas validated against realistic industrial use cases

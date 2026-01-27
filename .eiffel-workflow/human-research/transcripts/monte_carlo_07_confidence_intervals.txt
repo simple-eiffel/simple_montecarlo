@@ -1,0 +1,865 @@
+0:00
+The following content is provided under a Creative Commons license. Your support will help MIT OpenCourseWare
+0:06
+continue to offer high quality educational resources for free. To make a donation or to view additional materials
+0:13
+from hundreds of MIT courses, visit MIT OpenCourseWare at ocw.mit.edu.
+0:18
+0:30
+JOHN GUTTAG: Hi, everybody.
+0:35
+Welcome back to class. I have a lot to cover today, so I'm just going to get right to it.
+0:42
+So you may remember at the end of last lecture, I talked about the Empirical Rule
+0:49
+and said that there were a couple of assumptions underlying it. That one is the mean estimation error is zero.
+Assumptions Underlying Empirical Rule
+0:57
+And second, that the distribution of errors will be normally distributed.
+1:03
+I didn't probably mention at the time, but we often call this distribution Gaussian after the astronomer Carl Gauss.
+1:11
+And it looks like that.
+1:16
+Normal distributions are very easy to generate in Python.
+1:21
+I have a little example here of generating, not a real normal distribution, but a discrete approximation
+1:28
+of one. And the thing to really notice about it here
+1:34
+is this line random.gauss. So that's a built in function of the random library.
+1:43
+The first argument is the mean. And the second argument is the standard deviation
+1:49
+or a mu and sigma as they're usually called. Every time I call that, I will get a different--
+1:57
+or usually a different random value drawn from a Gaussian with the mean, in this case of 0
+2:04
+and a standard deviation of 100. I'm then going to produce a plot of those
+2:10
+so you can see what it looks like. And I'm going to do that using some things we haven't seen before.
+2:16
+So first of all, we've seen histograms.
+2:22
+So pylab.hist produces a histogram.
+Generating Normally Distributed Data
+2:28
+Bins tells us how many bins we want in the histogram. I said we want 100.
+2:33
+The default is 10. Dist is the values it will use for it.
+2:39
+And then this is something we haven't seen before, weights.
+2:45
+Weights is a keyword argument. So normally when we produce a histogram,
+2:52
+we take all of the values, the minimum to the maximum,
+2:57
+and in this case, we would divide them into 100 bins, because I said, bins equals 100.
+3:07
+So the first bin might be, well, let's say we only had values ranging from 0 to 100.
+3:13
+The first bin would be all the 0's, all the 1's up to all the 99's.
+3:21
+And it weights each value in the bin by 1. So if the bin had 10 values falling in it,
+3:28
+the y-axis would be a 10. If the bin had 50 values falling in it,
+3:33
+the y-axis would go up to 50. You can tell it how much you want
+3:41
+to weight each bin, the elements in the bins. And say, no, I don't want them each to count as 1,
+3:48
+I want them to count as a half or a quarter, and that will change the y-axis.
+3:55
+So that's what I've done here. What I've said is I've created a list
+4:02
+and I want to say for each of the bins-- in this case I'm going to weigh each of them the same way--
+4:10
+the weight is going to be 1 over the number of samples.
+4:16
+I'm multiplying it by the len of dist, that will be how many items I have.
+4:23
+And that will tell me how much each one is being weighted. So for example, if I have, say, 1,000 items,
+4:38
+I could give 1,000 values and say, I want this item weighted by 1, and I
+4:43
+want this item over here weighted by 12 or a half. We rarely do that.
+4:50
+Usually, what we want is to give each item the same weight.
+4:55
+So why would I want it not to be weighted at just one?
+5:01
+Because I want my y-axis to be more easily interpreted,
+5:06
+and essentially give me the fraction of the values that fell in that bin.
+5:14
+And that's what I'm doing here. The other new thing I'm doing here
+5:20
+is the plotting commands, including pylab.hist, many of them return values.
+5:28
+Usually, I just ignore that value when we just say pylab.plot or pylab.hist.
+5:34
+Here I am taking the value. The value in this case for a histogram
+5:41
+is a tuple of length 2. The first element is a list or an array,
+5:50
+giving me how many items are in each bin. And the second is the patches used
+5:57
+to produce the beautiful pictures we're use to seeing. So here what I'm going to do is take this value
+6:05
+so that I can do this at the end.
+6:11
+Now, why would I want to look at the fraction within approximately 200 of the mean?
+6:16
+What is that going to correspond to in this case?
+6:22
+Well, if I divide 200 by 2 I get 100.
+6:27
+Which happens to be the standard deviation. So in this case, what I'm going to be looking at
+6:33
+is what fraction of the values fall within two standard deviations of the mean?
+6:39
+Kind of a check on the empirical rule, right? All right, when I run the code I get this.
+6:49
+So it is a discrete approximation to the probability density function.
+6:56
+You'll notice, unlike the previous picture I showed you which was nice and smooth, this is jaggedy.
+7:02
+You would expect it to be. And again, you can see it's very nice that the peak is what
+7:11
+we said the mean should be, 0. And then it falls off. And indeed, slightly more than 95%
+7:21
+fall within two standard deviations of the mean.
+7:26
+I'm not even surprised that it's a little bit more than 95% because, remember the magic number is 1.96, not 2.
+7:35
+But since this is only a finite sample, I only want it to be around 95.
+7:41
+I'm not going to worry too much whether it's bigger or smaller. All right?
+7:48
+So random.gauss does a nice job of giving us Gaussian values.
+7:53
+We plotted them and now you can see that I've got the relative frequency.
+7:59
+That's why I see fractions in the y-axis rather than counts.
+8:06
+And that would be because of the way I use the weights command. All right, let's return to PDFs.
+8:14
+So as we said last time, distributions can be defined by Probability Density Functions,
+8:21
+and that gives us the probability of some random variable lying between two values.
+8:27
+It defines a curve where the values in the x-axis lie between the minimum and maximum values of the variable.
+8:35
+And it's the area under the curve-- and we'll come back to this-- between those two points that give us
+8:42
+the probability of an example falling in that range. So now let's look at it for a normal distribution.
+8:50
+You may recall from the last lecture this rather exotic looking formula which defines a PDF for a normal distribution.
+PDF for Normal Distribution
+9:02
+And here's some code that's as straight forward
+9:07
+an implementation as one could imagine of this formula, OK.
+9:13
+So that now is a value that, given a mu and a sigma and an x, gives me the x associated
+9:21
+with that mu and sigma, OK?
+9:26
+And you'll notice there's nothing random about this.
+9:32
+All right, it is giving me the value. Now, let's go down here.
+9:41
+And I'm going to, for a set of x's, get
+9:47
+the set of y's corresponding to that and then plot it.
+9:53
+I'm going to set mu to 0 and sigma to 1, the so-called standard normal distribution.
+9:59
+And I'm going to look at the distribution from minus 4 to 4.
+10:05
+Nothing magic about that other than, as you'll see, it's kind of a place where it asymptotes near 0.
+10:13
+So while x is less than 4, I'll get the x-value, I'll get the y-value corresponding to that x
+10:20
+by calling Gaussian, increment x by 0.05 and do that until I'm done.
+10:29
+And then simply, I'll plot the x-values against the y-values and throw a title on it using pylab.title.
+10:39
+All right, code make sense?
+10:45
+Well, this is where I got that beautiful picture we've looked at before.
+10:50
+When I plotted here, it looks, actually quite smooth. It's not, it's really connecting a bunch of tiny little lines
+10:59
+but I made the points close enough together that it looks at least here smooth at this resolution.
+11:06
+So we know what the values on the x-axis are.
+11:12
+Those are the values I happen to want to look at, from minus 4 to 4.
+11:19
+What are the values on the y-axis?
+11:26
+We kind of would like to interpret them as probabilities, right? But we could be pretty suspicious about that
+11:34
+and then if we take this one point that's up here, we say the probability of that single point is 0.4.
+11:42
+Well, that doesn't make any sense because, in fact, we know the probability of any particular point
+11:49
+is 0 in some sense, right? So furthermore, if I chose a different value for sigma,
+11:58
+I can actually get this to go bigger than 1 on the y-axis.
+12:05
+So if you take sigma to be say, 0.1-- I think the y-axis goes up to something like 40.
+12:14
+So we know we don't have probabilities in the range 40. So if these aren't probabilities, what are they?
+12:21
+What are the y values? Well, not too surprising since I claimed
+12:27
+this was a probability density function, they're densities. Well, what's a density?
+12:34
+This makes sense. I'll say it and then I'll try and explain it.
+12:40
+It's a derivative of the cumulative distribution function.
+12:45
+Now, why are we talking about derivatives in the first place? Well, remember what we're trying to say.
+12:52
+If we want to ask, what's the probability of a value falling between here and here, we claim that that
+13:02
+was going to be the area under this curve, the integral.
+13:10
+Well, as you know from 18.01, there's a very clear relationship between derivatives
+13:17
+and integrals. And so if we interpret each of these points as a derivative,
+13:24
+in some sense the slope here, then we can look at this as the area just
+13:30
+by integrating under there. So to interpret a PDF, we always do it mathematically.
+13:39
+Actually, I do it just by looking at it. But the only really interesting mathematical questions to ask
+13:46
+have to do with area. Once we have the area, we can, then,
+13:51
+talk about the probabilities of some value falling within a region of the curve.
+13:58
+So what's interesting here is not the numbers per se on the y-axis but the shape of the curve,
+14:06
+because those numbers have to be related to the numbers on the x-axis, dx, dy right?
+14:14
+We're looking at derivatives. All right, so now, we have to talk about integration.
+14:22
+I promise you'll only hear about it for another few minutes then we'll leave the topic.
+14:27
+So I mentioned before SciPy as a library that contains a lot of useful mathematical functions.
+14:35
+One of them is integrate.quad.
+14:41
+Well, the integrate part is obvious. It means integration. Quad is telling you the algorithm it's
+14:47
+choosing to do the integration. All of these integrals are going to be actual approximations
+14:54
+to the real integral. SciPy is not doing some clever mathematics
+15:01
+to get an analytical solution. It's using a numerical technique to approximate the integral.
+15:08
+And the one here happens to be called quadrature, it doesn't matter.
+15:14
+All right, you can pass it up to four arguments. You must pass it to function to be integrated,
+15:22
+that makes sense. A number representing the lower limit of the integration--
+15:29
+you need to give it that. A number representing the upper limit-- you need to give it that.
+15:35
+And then the fourth argument is a tuple supplying all values for the arguments,
+15:43
+except the first of the function you are integrating. I'll show you an example of that on the next slide.
+15:51
+And we'll see that it returns a tuple, an approximation to the result, what it thinks the integral is,
+15:58
+and an estimate of how much error there might be in that one.
+16:04
+We'll ignore the error for the moment. All right, let's look at the code.
+16:10
+So we start by importing scipy.integrate.
+Checking the Empirical Rule
+16:17
+That gives us all the different integration methods. I'm not going to show you the code for Gaussian
+16:23
+since I showed it to you a couple of minutes ago. But I wanted you to remember that it takes three arguments, x, mu, and sigma.
+16:32
+Because when we get down here to the integration, we'll pass at the function Gaussian and then the values
+16:44
+that we want to integrate over.
+16:49
+So those will be the values that x can take upon.
+16:56
+And that will change as we go from mu
+17:02
+minus the number of standard deviations times sigma to mu plus the number of standard deviations times sigma.
+17:09
+And then, this is the optional fourth argument, the tuple, mu, and sigma.
+17:15
+Why do I need to pass that in? Because Gaussian is a ternary argument, or a function
+17:22
+that takes three values. And I'm going to integrate over values of x so I have to fix mu and sigma to constants, which
+17:32
+is what I'm doing down here. And then I'll take the zeroth value, which is its estimate of the integral.
+17:41
+All right, so that's the new thing. The rest of the code is all stuff you've seen.
+17:46
+For t and range number of trials, I'm going to choose a random mu between minus 10 and 10
+17:53
+and a random sigma between 1 and 10. It doesn't matter what those constants are.
+18:00
+And then for the number of standard deviations in 1, 1.96, and 3, I'm going to integrate
+18:10
+Gaussian over that range.
+18:16
+And then we're just going to see how many of them fall within that range.
+18:21
+In some sense, what we're doing is we're checking the empirical rule. We're saying, take the Gaussian.
+18:27
+I don't care what mu and sigma are. It doesn't matter. The empirical rule will still hold, I think.
+18:34
+But we're just checking it here, OK?
+18:41
+Well, here are the results. So from mu equals 9 and sigma equals 6, I happened to choose those, we'll
+18:49
+see the fracture within 1, fraction within 1.96 and 3.
+18:55
+And so for these random mus and sigmas, you can see that all of them-- and you
+19:00
+can set them to whatever you want when you get your hand them the code. Essentially, what we have is, whoops, the empirical rule
+19:10
+actually works. One of those beautiful cases where you can test the theory
+19:17
+and see that the theory really is sound. So there we go.
+19:25
+So why am I making such a big deal of normal distributions? They have lots of nice mathematical properties,
+19:31
+some of which we've already talked about. But all of that would be irrelevant if we didn't see them.
+19:38
+The good news is they're all over the place. I've just taken a few here.
+19:43
+Up here we'll see SAT scores. I would never show that to high school students,
+Everybody Likes Normal Distributions
+19:50
+or GREs to you guys. But you can see that they are amazingly
+19:56
+well-distributed along a normal distribution.
+20:02
+On down here, this is plotting percent change in oil prices.
+20:09
+And again, we see something very close to a normal distribution. And here is just looking at heights of men and women.
+20:17
+And again, they clearly look very normal.
+20:23
+So it's really quite impressive how often they occur.
+20:29
+But not everything is normal. So we saw that the empirical rule
+20:37
+works for normal distributions. I won't say I proved it for you. I illustrated it for you with a bunch of examples.
+20:43
+But are the outcomes of the spins of a roulette wheel
+20:49
+normal? No. They're totally uniform, right?
+20:56
+Everything is equally probable-- a 4, a 6, an 11, a 13, double-0
+21:01
+if you're in Las Vegas. They're all equally probable. So if I plotted those, I'd basically
+21:09
+just get a straight line with everything at 1 over however many pockets there are.
+21:17
+So in that case, why does the empirical rule work?
+21:23
+We saw that we were doing some estimates about returns and we used the empirical rule, we checked it
+21:30
+and, by George, it was telling us the truth.
+21:35
+And the reason is because we're not reasoning about a single spin of the wheel
+21:42
+but about the mean of a set of spins. So if you think about it, what we were reasoning about
+21:49
+was the return of betting. If we look at one spin--
+21:55
+well, let's say we bet $1. The return is either minus 1 because we've lost our dollar.
+22:02
+Or if we get lucky and our pocket happens to come up, it was 36, I think, or 35.
+22:08
+I forget which, OK? But that's all.
+22:13
+So if we plotted a histogram, we would see a huge peak at minus 1 and a little bump
+22:23
+here at 36 and nothing in the middle.
+22:28
+Clearly, not a normal distribution.
+22:36
+But what we're reasoning about is not the return of a single spin but the return of many spins.
+22:43
+If we played 1,000 spins, what is our expected return?
+22:51
+As soon as we end up reasoning, not about a single event but about the mean of something, we can imply something
+22:59
+called the Central Limit Theorem. And here it is. It's actually for something so important, very simple.
+The Central Limit Theorem (CLT)
+23:10
+It says that given a sufficiently large sample-- and I love terms like sufficiently large
+23:16
+but we'll later put a little meat on that-- the following three things are true.
+23:22
+The means of the samples in a set of samples, the so-called sample means will be approximately normally
+23:29
+distributed. So that says if I take a sample--
+23:39
+and remember, a sample will have multiple examples. So just to remind people.
+23:45
+A population is a set of examples.
+23:55
+24:00
+A sample is a subset of the population.
+24:07
+24:12
+So it too is a set of examples, typically.
+24:19
+If this set is sufficiently large--
+24:25
+certainly 1 is not sufficiently large-- then it will be the case that the mean of the means--
+24:34
+so I take the mean of each sample and then I can now plot all of those means
+24:39
+and so take the mean of those, right-- and they'll be normally distributed.
+24:45
+Furthermore, this distribution will
+24:53
+have a mean that is close to the mean of the population.
+25:00
+The mean of the means will be close to the mean of the population. And the variance of the sample means
+25:07
+will be close to the variance of the population divided by the sample size.
+25:13
+This is really amazing that this is
+25:19
+true and dramatically useful.
+25:26
+So to get some insight, let's check it. To do that, postulate that we have this kind of miraculous
+25:34
+die. So instead of a die that when you roll it you get a number 1, 2, 3, 4, 5, or 6, this particular die is continuous.
+25:44
+It gives you a real number between 0 and 5, or maybe it's between 1 and 6, OK?
+25:53
+So it's a continuous die. What we're going to do is roll it a lot of times.
+26:02
+26:07
+We're going to say, how many die?
+26:13
+And then, how many times are we going to roll that number of die? So the number of die will be the sample size--
+26:21
+number of dice will be the sample size. And then we'll take a bunch of samples which
+26:26
+I'm calling number of rolls. And then we'll plot it and I'm just choosing some bins and some colors
+26:34
+and some style and various other things just to show you how we use the keyword arguments.
+26:39
+Actually, I said the number of rolls is the number of trials.
+26:46
+But it isn't quite that because I'm going to get the number of trials by dividing the number of rolls by the number of dice.
+26:55
+So if I have more dice, I get to have fewer samples, more dice per sample, all right?
+27:04
+Then we'll just do it. So it will be between 0 and 5 because random.random
+27:11
+returns a number between 0 and 1 and I'm multiplying it by 5.
+27:17
+And then we'll look at the means and we'll plot it all.
+27:24
+Again, we're playing games with weights just
+27:32
+to make the plot a little easier to read. And here's what we get.
+27:39
+If we roll one die, the mean is very close to 2.5.
+27:46
+Well, that's certainly what you'd expect, right? It's some random number between 0 and 5.
+27:51
+2.5 is a pretty good guess as to what it should average. And it has a standard deviation of 1.44.
+28:01
+And that's a little harder to guess that that's what it would be. But you could figure it out with a little math
+28:07
+or as I did here with the simulation. But now, if I roll 50 dice, well, again, the mean
+28:15
+is close to 2.5. It's what you'd expect, right?
+28:22
+I roll 50 die, I get the mean value of those 50.
+28:27
+But look how much smaller the standard deviation is.
+28:34
+More importantly, what we see here is that if we look at the value, the probability
+28:46
+is flat for all possible values between 0 and 5
+28:51
+for a single die. But if we look at the distribution for the means,
+28:57
+it's not quite Gaussian but it's pretty close. Why is it not Gaussian?
+29:04
+Well, I didn't do it an infinite number of times. Did it quite a few, but not an infinite number.
+29:09
+Enough that you didn't want to sit here while it ran. But you can see the amazing thing here
+29:15
+that when I go from looking at 1 to looking at the mean of 50, suddenly I have a normal distribution.
+29:25
+And that means that I can bring to bear on the problem the Central Limit Theorem.
+29:35
+We can try it for roulette. Again I'm not going to make you sit through a million trials
+29:40
+of 200 spins each. I'll do it only for fair roulette.
+29:46
+And again, this is a very simple simulation, and we'll see what we get.
+29:52
+And what we see is it's not quite normal, again,
+29:59
+but it definitely has that shape. Now, it's going to be a little bit
+30:06
+strange because I can't lose more than one,
+30:15
+if I'm betting one. So it will never be quite normal because it's
+30:20
+going to be truncated down on the left side,
+30:25
+whereas the tail can be arbitrarily long.
+30:31
+So again, mathematically it can't be normal
+30:36
+but it's close enough in the main region, where
+30:41
+most of the values lie, that we can get away with applying the empirical rule and looking at answers.
+30:49
+And indeed as we saw, it does work.
+30:56
+So what's the moral here? It doesn't matter what the shape of the distribution
+31:04
+of the original values happen to be. If we're trying to estimate the mean using samples that
+31:12
+are sufficiently large, the CLT will allow us to use the empirical rule when
+31:20
+computing confidence intervals.
+31:25
+Even if we go back and look at this anomaly over in the left, what do you think would happen if I, instead of had 200, have,
+31:34
+say, 1,000?
+31:40
+What's the probability of the average return being minus 1
+31:46
+of 1,000 bets? Much smaller than for 100 bets.
+31:54
+To lose 1,000 times in a row is pretty unlikely. So to get all the way to the left
+32:01
+is going to be less likely, and, therefore, the thing will start looking more and more normal
+32:06
+as the samples get bigger. All right, and so we can use the CLT
+32:15
+to justify using the empirical rule when we compute confidence intervals.
+32:21
+All right, I want to look at one more example in detail. This is kind of an interesting one.
+32:27
+You might think that randomness is of no use for, say, finding the value of pi because there's
+32:34
+nothing random about that. Similarly, you might think that randomness was of no use
+32:40
+in integrating a function, but in fact, the way those numerical algorithms work is they use randomness.
+32:47
+What you're about to see is that randomness, and indeed things related to Monte Carlo simulations,
+32:55
+can be enormously useful, even when you're computing something that is inherently not random like the value of pi here.
+33:04
+And we won't ask you to remember that many digits on the quiz and the exam. All right, so what's pi?
+33:10
+Well, people have known about pi for thousands and thousands of years. And what people knew was that there was some constant,
+33:20
+we'll call it pi. It wasn't always called that. Such that it was equal to the circumference of a circle divided by the diameter,
+33:28
+and furthermore, the area was going to be pi r squared.
+33:34
+People knew that way back to the Babylonians and the Egyptians. What they didn't know is what that value was.
+33:43
+The earliest known estimate of pi was by the Egyptians, on something called the Rhind Papyrus pictured here.
+33:51
+And they estimated pi to be 4 times 8 over 9 squared, or 3.16.
+Rhind Papyrus
+33:59
+Not so bad. About 1,100 years later an estimate of pi
+34:08
+appeared in the Bible, Kings 7:23.
+34:14
+It didn't say pi is but it described--
+34:20
+I think this was a construction of King Solomon's Temple. "He made a molten sea, ten cubits from one brim
+34:25
+to the other." it was round. It was a circle. "His height was five cubits and a line of 30 cubits
+34:33
+did compass it round about." Well, if you do the arithmetic, what does
+34:38
+this imply the value of pi to be? 3, and I'm sure that's what Mike Pence thinks it is.
+34:46
+34:53
+About 300 years later, Archimedes
+34:58
+did a better job of it. He estimated pi by constructing a 96-sided polygon.
+35:08
+There's a picture of one. It looks a lot like a circle. On the left is one with fewer sides.
+35:14
+And what he did is he then-- since it was a polygon he knew how to compute its area
+35:20
+or it's circumference and he just counted things up and he said, well, pi is somewhere
+35:25
+between 223/71 and 22/7.
+35:31
+And that turns out to actually-- if you take the average of that it will be a really good estimate.
+35:39
+2000 years after Archimedes, the French mathematicians
+35:44
+Buffon and Laplace proposed finding the value of pi using what we would today call a Monte Carlo
+35:51
+simulation. They did not have a computer to execute this on.
+35:56
+So what they proposed-- it started with this mathematics.
+36:02
+They took a circle and inscribed it in a square, a square of two units of whatever it
+36:11
+is per side. And therefore we know that the area of the square is 2 times 2 or 4.
+36:19
+We know that the area of the circle is pi r squared.
+36:24
+And since we know that r is 1-- because that's the square it's inscribed in-- we know that the area of a circle is exactly pi.
+36:32
+What Buffon then proposed was dropping a bunch of needles
+36:40
+at random-- kind of like when Professor Grimson was sorting things--
+36:46
+and seeing where they land. Some would land in the square but not in the circle.
+36:53
+Some would land in the circle. You would ignore any that landed outside the square.
+36:59
+And then they said, well, since they're falling at random, the ratio of the needles in the circle to needles in the square
+37:07
+should exactly equal the area of the square over the area of the circle, exactly,
+37:13
+if you did an infinite number of needles. Does that make sense?
+37:19
+Now, given that, you can do some algebra and solve for the area of the circle
+37:27
+and say it has to be the area of the square times the number of needles in the circle divided
+37:33
+by the needles in the square. And since we know that the area of the circle
+37:38
+is pi that tells us that pi is going
+37:44
+to equal four times the needles in the circle. That's 4 is the area of the square divided
+37:51
+by the number of needles in the square. And so the argument was you can just drop a bunch of these needles, see where they land,
+37:59
+add them up and from that you would magically now know the actual value of pi.
+38:06
+Well, we tried a simulation one year in class but rather than using needles we had an archer
+38:12
+and we blindfolded him so he would shoot arrows at random and we would see where they ended up.
+38:21
+There's a video of this here if you want to see it. I'm going to play only the very end of the video which
+38:27
+describes the results.
+38:40
+Maybe we should just use Python to build a Monte Carlo simulation instead. So that's what happened.
+38:46
+After it was all over, Anna came up and gave me some sound advice. Yeah, I was very proud of that particular shot with the apple.
+38:53
+I had hoped the student would put it on his or her head but no one volunteered.
+38:59
+That was not done blindfolded. Any rate, so here is the simulation.
+39:05
+So first we have throwing the needles. For needles in range 1 to number of needles plus 1,
+39:15
+we're going to choose the random x or random y
+39:20
+and we're going to see whether or not it's in the circle. And there we will use the Pythagorean theorem
+39:26
+to tell us that, all right? And we'll just do this, and then we're
+39:33
+going to return exactly the formula we saw in the previous slide.
+39:39
+Now, comes an interesting part. We need to get an estimate. So we start with the number of needles
+39:45
+and the number of trials. For t in range number of trials, we'll
+Simulating Buffon-Laplace Method, cont.
+39:51
+get a guess by throwing number of needles. And then we'll append that guess to our list of estimates.
+40:00
+We'll then compute the standard deviation,
+40:10
+get the current estimate which will be the sum of the estimates divided by the len of the estimate, just the mean of the estimate.
+40:17
+And then we'll print it, all right? So given a number of needles and a number of trials,
+40:24
+we'll estimate pi and we'll give you the standard deviation of that estimate.
+40:33
+However, to do that within a certain precision, I'm going to have yet another loop.
+40:40
+And I'm showing you this because we often structure simulations this way.
+40:48
+So what I have here is the number of trials, which is not so interesting, but the precision.
+40:55
+I'm saying, I would like to know the value of pi and I would like to have good reason
+41:01
+to believe that the value you give me is within 0.005, in this case, of the true value.
+41:08
+Or maybe more precisely, I would like
+41:14
+to know with a confidence of 95% that the true value is within a certain range.
+41:22
+So what this is going to do is it's just going to-- and I should probably use 1.96 instead of 2, but oh, well--
+41:32
+it's just going to keep increasing the number of needles, doubling the number of needles
+41:38
+until it's confident about the estimate, confident enough, all right?
+41:44
+So this is a very common thing. We don't know how many needles we should need so let's
+41:50
+just start with some small number and we'll keep going until we're good.
+41:57
+All right, what happens when we run it? Well, we start with some estimates
+42:03
+that when we had 1,000 needles it told us that pi was 3.148
+42:12
+and standard deviation was 0.047 et cetera. So a couple of things to notice.
+42:19
+One, are my estimates of pi getting monotonically better?
+42:26
+You'd like to think, as I add more needles, my estimates are getting more accurate.
+42:31
+So that's question one. Are they getting more accurate?
+42:40
+Not monotonically, right? If we look at it, where are they getting worse?
+42:48
+Well, let's see.
+42:53
+All right, 3.148, well, 3.13 is already worse, right?
+43:00
+So I double the number of needles and I get a worse estimate.
+43:06
+Now, the trend is good. By the time I get here, I've got a pretty good estimate.
+43:15
+So overall as I look at larger samples, a bigger
+43:23
+subset of the population, my estimates are trending towards better but not every time.
+43:29
+On the other hand, let's look at the standard deviations.
+43:38
+What we see here is that the standard deviations are, indeed, getting monotonically better.
+43:45
+Now, there's nothing mathematical guaranteeing that,
+43:52
+right? Because there is randomness here. But I'm increasing the number of needles by so much
+43:59
+that it kind of overrides the bad luck of maybe getting a bad random set.
+44:04
+And we see those are getting better. So the important thing to see here
+44:10
+is not that I happened to get a better estimate, but that I know more about the estimate.
+44:19
+I can have more confidence in the estimate because it's closing in on it.
+44:26
+So the moral here is it's not sufficient to produce
+44:32
+a good answer. I've said this before. We need to have reason to believe that it
+44:38
+is close to the right answer.
+44:43
+So in this case, I'm using the standard deviation and say, given that it's gotten quite small--
+44:51
+you know, 1.96 times 0.002 is indeed a small number.
+44:58
+I could make it smaller if I wanted.
+45:04
+I have good reason to believe I'm close to the right value of pi. Everyone agree with that?
+45:12
+Is that right? Not quite, actually.
+45:19
+It would be nice if it were true. But it isn't. So let's look at some things.
+45:26
+Is it correct to state that 95% of the time we run this simulation you'll get an estimate of pi
+45:32
+between these two values? I don't expect you to do the arithmetic in your head
+45:37
+but the answer is yes. So that is something we believe is
+45:42
+true by the math we've been looking at for the last two lectures.
+45:50
+Next statement, with a probability of 0.95, the actual value of pi is between these two things.
+45:58
+Is that true?
+46:07
+In fact, if I were to say, with a probability of 1, the actual value is pi is between those two values,
+46:14
+would it be true? Yes. So they are both true facts.
+46:20
+However, only the first of these can be
+46:27
+inferred from our simulation. While the second fact is true, we
+46:33
+can't infer it from the simulation. And to show you that, statistically valid is not
+46:44
+the same as true, we'll look at this. I've introduced a bug in my simulation.
+Introduce a Bug
+46:53
+I've replaced the 4 that we saw we needed by 2, now,
+47:00
+an easy kind of mistake to make. And now, if we go to the code--
+47:06
+47:15
+well, what do you think will happen if we go to the code and run it?
+47:21
+We'll try it.
+47:27
+We'll go down here to the code.
+47:33
+We'll make that a 2.
+47:49
+And what you'll see as it runs is that once again we're
+47:55
+getting very nice confidence intervals, but totally
+48:02
+bogus values of pi.
+48:08
+So the statistics can tell us something about how reproducible our simulation is
+48:15
+but not whether the simulation is an actually, accurate model of reality.
+48:21
+So what do you need to do? You need to do something like a sanity check. So here you might look at a polygon
+48:28
+and say, well, clearly that's a totally wrong number. Something is wrong with my code.
+48:33
+48:44
+OK, so just to wrap-up.
+48:49
+What we've shown is a way to find pi. This is a generally useful technique.
+48:56
+To estimate the area of any region r, you pick an enclosing region, call
+49:02
+it e, such that it's easy to estimate the area of e,
+49:08
+and r lies within it. Pick some random sets of points within e, let f be the fraction
+49:16
+and fall within r, multiply e by f and you're done.
+49:21
+So this for example, is a very common way to do integration. I promised you we'd talk about integration.
+49:29
+So here's a sine of x. If I want to integrate the sine of x over some region,
+49:35
+as done here, all I need to do is pick a bunch of random points, red and black in this case,
+49:43
+and look at the ratio of one to the other. So showing how we can use randomness
+49:51
+to again, compute something that is not inherently random. This is a trick people use over and over
+49:58
+and over again when confronted with some situation where
+50:03
+it's not easy to solve for things mathematically. You just do a simulation and if you do it right,
+50:11
+you get a very good answer. All right, we will move on to a different topic on Wednesday.
+50:20

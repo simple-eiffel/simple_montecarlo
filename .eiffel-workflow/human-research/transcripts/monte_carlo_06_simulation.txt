@@ -1,0 +1,228 @@
+0:13
+Bayesian reasoning was first articulated
+0:15
+by the Reverend Thomas Bayes,
+0:18
+a clergyman from Tunbridge Wells
+0:19
+in southern England,
+0:21
+way back in the 18th Century.
+0:23
+Bayes wasn't well-known in his lifetime.
+0:26
+In fact, his theory wasn't published
+0:28
+until two years after he had died.
+0:30
+But his work has gone on
+0:31
+to profoundly shape science, medicine
+0:34
+and artificial intelligence.
+0:36
+It even helped crack the Nazis' Enigma code
+0:39
+during World War II.
+What is Bayesian logic?
+0:41
+So what is Bayesian reasoning
+0:43
+and how can it help us understand the world?
+0:46
+Thomas Bayes introduced two vital ideas.
+0:50
+First, that our beliefs
+0:52
+can be expressed as probabilities,
+0:54
+and second, how our beliefs
+0:56
+should be revised when we obtain more information.
+1:00
+Essentially, he produced a theory
+1:02
+for learning from experience.
+1:04
+Bayesian analysis can be used in any situation
+1:07
+where each new item of information
+1:09
+changes our beliefs.
+Alan Turing and the Enigma code
+1:11
+Alan Turing and his team at Bletchley Park
+1:14
+used Bayesian ideas to learn about
+1:17
+the settings of Enigma machines in World War II,
+1:20
+changing their opinion as new patterns were found.
+1:23
+The spam filter on your email account
+1:26
+will use Bayesian analysis to change
+1:28
+its probability that your email message is spam
+1:31
+as each new suspicious feature is detected.
+Bayesian analysis in breast cancer screening
+1:34
+Take breast cancer screening in the UK.
+1:37
+Mammograms are rather accurate,
+1:40
+detecting about 90% of cancers,
+1:42
+and 97% of women without cancer
+1:45
+correctly get a negative test result.
+1:48
+But what about the other 3%?
+1:50
+Let's consider what we would expect to happen
+1:53
+to 100 women being tested.
+1:55
+Based on past experience of the rate
+1:57
+of breast cancer among women getting mammograms,
+2:00
+we would expect one out of the 100
+2:02
+to have cancer, and that case is almost certain
+2:04
+to be picked up on the mammogram.
+2:06
+Of the remaining 99 without cancer,
+2:09
+we would expect three women
+2:11
+to get a false positive result.
+2:13
+So in total, we expect 1 + 3 = 4 equals 4
+2:16
+positive tests, but only one actually has cancer.
+2:20
+From this perspective, looking only at the women
+2:22
+who get a positive result,
+2:24
+perhaps the test does not seem so accurate.
+2:27
+Around three out of four,
+2:28
+or 75% of the women recalled,
+2:31
+don't have cancer.
+2:33
+Further tests should rapidly identify
+2:35
+these three false positives.
+2:37
+This is an example of using Bayesian analysis.
+2:40
+Since we are taking into account the base rate
+2:42
+for the condition, our prior probability
+2:45
+that a random woman being tested
+2:47
+has breast cancer is 1%,
+2:49
+and after getting a positive test result,
+2:52
+this is updated to what is called
+2:53
+a posterior probability,
+2:55
+which is one out of four, or 25%.
+2:58
+Of course, further investigations
+3:00
+will eventually change the probabilities
+3:02
+of those who are recalled
+3:04
+either to 0% or, less fortunately, 100%.
+3:08
+The use of Bayesian analysis
+3:11
+in medical testing is now standard.
+Bayesian methods in science - so-called Bayesian inference
+3:13
+However, more controversial
+3:15
+is the use of Bayesian methods in science -
+3:18
+so-called Bayesian inference.
+3:20
+The traditional view of science is that
+3:23
+it is a completely objective activity,
+3:25
+that data is analysed without preconceptions
+3:28
+and the results speak for themselves.
+3:31
+The Bayesian perspective is somewhat different.
+3:33
+It acknowledges that there are always
+3:36
+judgments underlying every analysis
+3:38
+and that we don't start from a blank slate.
+3:41
+Each set of data adds to our existing knowledge,
+3:44
+rather than standing entirely on its own.
+3:46
+For example, clinical trials of new drugs
+3:49
+are not designed in complete ignorance.
+3:52
+There is always some historical evidence
+3:54
+available about the potential effectiveness
+3:56
+of the new therapy, and expert judgments can
+3:59
+be elicited and used to prioritise investigations
+4:02
+and produce efficient designs.
+Do we have Bayesian brains?
+4:04
+And it's even thought
+4:06
+that we have Bayesian brains.
+4:08
+We don't start from scratch to interpret
+4:10
+our sensations for each second that passes.
+4:13
+Instead, we always have prior expectations
+4:16
+of what we might experience next,
+4:18
+and then new observations
+4:20
+update our beliefs accordingly.
+Conclusions
+4:23
+Fundamentally, Bayesian ideas
+4:25
+reflect what it means to be human.
+4:27
+We live in a world of uncertainty,
+4:29
+but we always have prior expectations
+4:31
+of what might happen next, and we revise
+4:34
+that uncertainty as we learn from experience.
+4:37
+All based on the ideas
+4:38
+of a rather obscure 18th-century cleric
+4:42
+from Tunbridge Wells.

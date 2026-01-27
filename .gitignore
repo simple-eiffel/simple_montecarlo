@@ -1,0 +1,40 @@
+# EiffelStudio build artifacts
+EIFGENs/
+*.exe
+*.dll
+
+# Compilation logs
+*.log
+compile_output.txt
+exception_trace.log
+
+# IDE
+.classpath
+.project
+.settings/
+*.suo
+*.user
+*.sln.docstates
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Runtime artifacts
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.exp
+*.pdb
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*.orig

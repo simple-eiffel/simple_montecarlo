@@ -1,0 +1,862 @@
+0:00
+The following content is provided under a Creative Commons license. Your support will help MIT OpenCourseWare
+0:06
+continue to offer high quality educational resources for free. To make a donation or to view additional materials
+0:13
+from hundreds of MIT courses, visit MIT OpenCourseWare at ocw.mit.edu.
+0:18
+0:30
+JOHN GUTTAG: Today we're starting a new topic, which is, of course, related to previous topics.
+0:36
+As usual, if you go to either the 60002 or the 600 web site,
+0:44
+you'll find both today's PowerPoint and today's Python.
+0:49
+You'll discover if you look at the Python file that there is quite a lot of code in there. And I'll be talking only about some of it.
+0:57
+But it's probably all worth looking at. And a fair amount of reading associated with this week.
+1:06
+Why are we looking at random walks? See a picture here of, think of them as molecules just bouncing
+1:13
+around. This is actually a picture of what's called Brownian motion, though Robert Brown probably
+1:20
+did not discover it. We're looking at random walks because, well, first of all,
+1:27
+they're important in many domains. There are people who will argue, for example,
+1:32
+that the movement of prices in the stock market is best modeled as a random walk.
+1:37
+There was a very popular book called A Random Walk Down Wall Street that made this argument.
+1:43
+And a lot of modern portfolio analysis is based upon that.
+1:49
+Those of you who are not interested in making money, and I presume that's most of you,
+1:55
+it's also very important in many physical processes. We use random walks, say, to model diffusion,
+2:02
+heat diffusion, or the diffusion of molecules in suspension, et cetera.
+2:08
+So they're very important in a lot of scientific, and indeed, social disciplines.
+2:14
+They're not the only important thing, so why are we looking at those? Because I think it provides a really good illustration
+2:22
+of how we can use simulation to understand the world around us.
+Why Random Walks?
+2:29
+And it does give me an excuse to cover some important topics related to programming.
+2:34
+You'll remember that one of the subtexts of the course is while I'm covering a lot of what you might think
+2:40
+of as abstract material, we're using it as an excuse to teach more about programming and software
+2:46
+engineering. A little practice with classes and subclassing, and we're going to also look at producing plots.
+2:56
+So the first random walk I want to look at is actually not a diffusion process or the stock market,
+3:02
+but an actual walk. So imagine that you've got a field which has somehow
+3:07
+inexplicably been mown to look like a piece of graph paper, and you've got a drunk wandering around the field,
+Drunkard's Walk
+3:15
+taking a step every once in a while in some random direction. We can then ask the question is there
+3:23
+an interesting relationship between the number of steps the drunk takes and how far the drunk is
+3:30
+from the origin at the end of those steps? You could imagine that if the drunk takes more steps,
+3:37
+he's ever further from the origin. Or maybe you could imagine, since it's random,
+3:42
+that he just wanders away and he wanders back in all directions and more or less never gets very far.
+3:50
+So just out of curiosity, I'll take a poll. Who thinks that the drunk doesn't much
+3:56
+matter how many steps he takes, he'll be more or less the same distance away?
+4:02
+And who thinks the more steps he takes, the further away he's likely to be?
+4:08
+It seems to be a season where when you take polls, they come out almost tied.
+4:18
+Let's look at a small example. Suppose he takes one step only.
+4:23
+Well, if he takes one step, and we'll assume for simplicity that he's not so drunk
+4:28
+that he moves at random. He either moves north or south, east or west.
+4:34
+These are all the places he can get to in one step. What they have in common is that after one step,
+4:40
+the drunk is always exactly one unit away from the origin.
+4:46
+Well, how about after two steps? So without loss of generality, let's assume that
+4:52
+the first step-- let me use the pen that you're supposed to use to write on this, rather than this pen, which would
+5:02
+make a real mess on my screen.
+5:07
+What did I do with it? Well, I won't write on it. So without loss of generality, we'll
+Possible Distances After Two Steps
+5:15
+assume that the drunk is there after one step.
+5:20
+Took one step to the east. Well, after two steps, those are all the possible places he could be.
+5:26
+So on average, how far is the drunk from the origin? Well, if we look, he could either be two steps away,
+5:35
+if he took another step east, zero steps away, if he took a step west, or what do we see for the top two?
+5:47
+Well, the top and the bottom one, we can go back and use the Pythagorean theorem.
+5:57
+c squared equals a squared plus b squared.
+6:04
+And that will tell us that it'll be the square root of a squared plus b squared.
+6:10
+And that will tell us how far away the upper two are,
+6:15
+and then we can just average them and get a distance. And as we can see, on average, the drunk
+6:22
+will be a little bit further away after two steps than after one step.
+6:28
+Well how about after 100,000 steps? It would be a little bit tedious to go through the case
+6:35
+analysis I just did. There are a lot of cases after 100,000 steps.
+6:41
+So we end up resorting to a simulation. So we'll structure it exactly the same way
+6:49
+we've been structuring our other simulations. We're going to simulate one walk of k steps, n such walks,
+6:58
+and then report the average distance from the origin of the n walks.
+7:05
+Before we do that, in line with the software engineering theme of the course, we'll start by defining
+7:11
+some useful abstractions. There are three of them I want to look at. Location, the field that the drunk is in,
+7:19
+and the drunk him or herself.
+7:24
+So let's first look at location. This is going to be an immutable type.
+Class Location, part 1
+7:31
+So what we see here-- as long as I can't point in the screen, I'll point with a pointer--
+7:37
+is that we'll initiate it. We'll initialize it with an x and y value.
+7:43
+That makes sense. We'll be able to have two getters, getX and getY.
+7:50
+And here's how we see it's immutable. What move is doing is it's not changing the location,
+7:56
+it's returning a new location. Perhaps move is poor choice of name for that.
+8:02
+But that is what it's doing. It's just returning a new location where it adds the change in x and the change in y
+8:09
+to get two new xy values. Notice, by the way, that I'm not restricting
+8:16
+these to be integers, or one, or anything like that. So this would work even if I did not
+8:22
+want to take those nice little east-west, north-south steps.
+8:29
+I've got a underbar underbar string, _str_, and then here's my implementation--
+8:35
+you can see it's very sophisticated-- of the Pythagorean theorem.
+8:41
+So I just do it that way, and that will get me the distance between two things.
+8:49
+It's one of the annoying things about classes in, actually, all languages I know with classes, is
+8:55
+you would like to think that self and other-- there's a symmetry here. The distance from self to other is the same as from other
+9:02
+to self. But syntactically, because of the way the language is structured, we treat them a little bit
+9:08
+differently. How about class Drunk?
+9:15
+Well, this is kind of boring. Drunk has a name and a string.
+Class Drunk
+9:22
+And that's all. The point of this, and I don't think
+9:27
+we've looked at this before, is this is not intended to be a useful class on its own.
+9:34
+It's what we call a base class. The notion here is its only purpose is to be inherited.
+9:44
+It's not supposed to be useful on itself, but it does give me something that will
+9:49
+be used for the two subclasses.
+9:54
+And we'll look at two subclasses. The so-called usual drunk, the one I tried to simulate when I was wandering around,
+Two Subclasses of Drunk
+10:02
+wanders around at random. And a drunk I like to think of it as a New Englander, or a masochistic drunk,
+10:09
+who tries forever to move ever northward, because he or she wants to be frozen.
+10:15
+I do like this picture of entering the state of Maine in the winter.
+10:22
+So here is the usual drunk. Subclass of drunk, and it can take steps
+10:29
+at random, one step, either increasing y, a step north,
+10:35
+decreasing y, a step south, increasing x, a step east,
+10:40
+or decreasing x a step west.
+10:45
+So those are the choices. And it's going to return one of those at random. I think we saw random.choice in the last lecture.
+10:53
+And then our masochistic drunk, it's almost the same, except the choices are slightly different.
+Two kinds of Drunks
+11:01
+If he chooses to head north, he doesn't go one step. He goes 1.1 steps north.
+11:08
+And if he chooses to go south, he only goes 9/10 of a step. So what we're seeing here is what's
+11:14
+called a biased random walk. And the bias here is the direction of the walk
+11:21
+that he's moving either up or down.
+11:27
+Pretty simple. How about just for to test things out,
+11:33
+we'll ask the question is this an immutable or a mutable type?
+11:41
+Are drunks mutable or immutable? This is a deep philosophical question.
+11:48
+But if we ignore the philosophical underpinnings of that question, what about the two types here?
+11:53
+Who thinks it's immutable?
+12:00
+Who thinks it's mutable? Why do you think it's mutable?
+12:05
+What's getting changed? The answer is nothing.
+12:11
+It gets created, and then it's returning the step,
+12:23
+but it's not actually changing the drunk. So so far we have two things that are immutable, drunks
+12:29
+and locations. Let's look at fields. Fields are a little bit more complicated.
+12:37
+So field will be a dictionary, and the dictionary is going to map a drunk to his or her location in the field.
+12:47
+So we can add a drunk at some location, and we're going to check.
+12:54
+And if the drunk is already there, we're not going to put the drunk in.
+Class Field, part 1
+13:00
+We're going to raise a value error, "Duplicate drunk." Otherwise we're going to set the value of drunkenness mapping
+13:09
+to loc. Now you see, by the way, why I wanted drunks to be immutable.
+13:14
+Because they have to be hashable so I can use them as a key in a dictionary.
+13:20
+So it was not an idle question whether they were immutable. It was an important question.
+13:27
+I can get the location of a drunk. If the drunk is not in there, then I'll raise a different value error, "Drunk not in field."
+13:35
+Otherwise I'll return the location associated with that drunk.
+13:42
+And finally, we're going to have moveDrunk.
+13:47
+Again I'll check whether the drunk is there. If the drunk is there, I'm going to get the distance
+Class Field, continued
+13:55
+on x and the distance in y by calling drunk.takeStep.
+14:02
+So we saw takeStep for a drunk didn't move the drunk anywhere, because the drunks were immutable,
+14:08
+but returned new locations. A new x and new values.
+14:13
+And then I'm going to use that to move the drunk in the field.
+14:20
+So I'll set self.drunk, so drunk to move x distance and y
+14:26
+distance.
+14:32
+So it's very simple, but having built this set of classes,
+14:38
+we can now actually write the simulation. Oh. What about our classes? Are they mutable or immutable?
+14:45
+Not classes. What about fields?
+14:51
+Any votes for mutable? Yeah, exactly.
+14:56
+Because you can see I'm mutating it right here. I'm changing the value of the dictionary.
+15:02
+And in fact, every time I add a drunk to the field, I'm changing the value of the dictionary, which
+15:08
+is to say mutating the field. So I'll have a bunch of locations,
+15:14
+which are immutable objects. Makes sense that a location is immutable. A bunch of drunks, and the thing I'm going to change
+15:21
+is where the drunks are in the field.
+15:29
+I said we'd start by simulating a single walk. So here it is, a walk in a field with a drunk, and that drunk
+Simulating a Single Walk
+15:40
+will take some number of steps in the field.
+15:46
+And you can see this. It's very simple. I just have a loop. Drunk takes some number of random steps,
+15:53
+and I'm going to return the distance from the start to the final location of the drunk.
+16:02
+So how far is the drunk from the origin? I then need to simulate multiple walks.
+16:09
+Notice here that I've got the number of steps,
+16:15
+the number of trials, and dClass stands for class of the drunk.
+16:23
+And that's because I want to use the same function to simulate as many different kinds of drunks
+16:29
+as I care about. We've only seen two here, the masochistic drunk and the usual drunk, but you can imagine many other kinds
+16:37
+as well. So let's do it. So here I'm going to simulate a walk for one drunk, Homer.
+16:45
+So we'll create a drunk named Homer, or the variable Homer, which is the drunk class.
+Simulating Multiple Walks
+16:53
+Then the origin, distances, and for t
+16:59
+in range number of trials, we'll just do it, and then we'll return the distances.
+17:05
+So it's initialized to the empty list. So we're going to return a list for however many trials we do,
+17:11
+how far the drunk ended up from the origin. Then we can average that, and we look at the mean.
+17:17
+Maybe we'll look at the min or the max. Lots of different questions we could ask about the behavior.
+17:23
+And now we can put it all together here.
+17:29
+So drunkTest will take a set of different walk lengths,
+17:35
+a list of different walk lengths, the number of trials, and the class.
+17:41
+And for a number of steps and walk lengths, distances will be simWalks of number of steps, numTrials, dClass.
+17:46
+And then I'm going to just print some statistics.
+17:52
+You may or may not have seen this.
+17:58
+This is something that's built in to Python. I can ask for the name of a class.
+18:09
+So dClass, remember, is a class, and _name_ will give me the name of the class.
+18:14
+Might be usual, it might be drunk, in this case.
+18:21
+So let's try it.
+18:27
+So the code we've looked at.
+18:34
+So let's go down here, and we'll run it, and we'll try it for walks of 10, 100, 1,000,
+18:40
+and 10,000 steps. And we'll do 100 trials.
+18:54
+Here's what we got. So my question to you is does this look plausible?
+19:01
+19:09
+What is it telling us here? Well, it's telling us here that the length of the walk actually doesn't really affect--
+19:16
+the number of steps doesn't affect how far the drunk gets. There's some randomness.
+19:22
+8.6, 8.57, 9.2, 8.7. Not much variance.
+19:29
+So we've done this simulation and we've learned something, maybe.
+19:36
+So does this look plausible?
+19:42
+We can look at it here. I've just transcribed it.
+19:49
+What do you think? Well, go ahead. AUDIENCE: I was going to say, it seems plausible
+19:56
+because after the first two steps, there's a 50% chance he's going closer to the origin.
+20:02
+And a 50% chance he's going away from it. JOHN GUTTAG: So we have at least one vote for plausible,
+20:07
+and it's certainly a plausible argument.
+20:13
+Well, one of the things we need to learn to do is whenever we build a simulation,
+20:21
+we need to do what I call a sanity check to see whether or not the simulation actually
+20:28
+makes sense. So if we're going to do a sanity check,
+20:33
+what might we do in this case? We should try it on cases where we think we know the answer.
+20:42
+So we say, let's take a really simple case where we're pretty sure we know what the answer is.
+20:48
+Let's run our simulation and make sure it gives us the right answer for this simple case.
+20:55
+So if we think of a sanity check here, maybe we should look at these numbers.
+21:02
+We just did it. We know how far the drunk should get in zero steps.
+21:08
+How far should the drunk move in zero steps? Zero. How far should the drunk move in one steps?
+21:14
+We know that should be one. Two steps, well, we knew what that should be.
+21:19
+Well, if I run this sanity check, these are the numbers I get.
+21:28
+I should be pretty suspicious. I should also be suspicious they're
+21:33
+kind of the same numbers I got for 10,000 steps.
+21:39
+What should I think about? I should think that maybe there's a bug in my code.
+21:46
+So if we now go back and look at the code, yes, this fails the pants on fire test
+21:53
+that there's clearly something wrong with these numbers.
+21:59
+What we were appending is walk of Homer, numTrials, 1. Well, numTrials is a constant.
+Sanity Check
+22:08
+It's always 100. What I intended to write here was not numTrials but numSteps.
+22:15
+I actually did this the first time
+22:21
+I wrote this simulation many years ago. I made this typo, if you will, and I
+22:27
+got these bizarre answers. So I looked at the code and I said, well, that's actually wrong.
+22:34
+No wonder it's always the same number. I'm calling it with a constant. The constant happens to be 100.
+22:40
+So let's go fix the simulation.
+22:57
+So this should have been numSteps.
+23:16
+Now let's run it again.
+23:22
+Well, these results are pretty different. Now we see that in fact, they're increasing.
+23:31
+Should I just look at this and be happy?
+23:37
+Probably not. I should run my sanity check again and make sure I get the right results for zero, one, and two.
+23:47
+So let's go back and do that, just to be a little bit safe.
+23:58
+So I'll just change this tuple of values to be--
+24:15
+and I should feel a lot better about this. The mean, the max, and the min are all zero
+24:21
+when he doesn't take any steps. One is exactly what we should expect,
+24:27
+and two is also-- the mean is where we would guess it to be, and the max is two, happened to take
+24:34
+two steps in the same direction, and the min is zero, happened to end up where he started.
+24:40
+So I've passed my sanity check. Doesn't mean my simulation is right,
+24:45
+but at least I have reason to be hopeful.
+24:51
+So getting back.
+25:01
+So we saw these results, and now we're getting the indication that in fact, contrary to what we might have thought,
+25:09
+it does appear to be that the more steps the drunk takes, the further away the drunk ends up.
+25:15
+And that was the usual drunk.
+25:20
+We can try the masochistic drunk, and then we see something pretty interesting.
+And the Masochistic Drunk?
+25:26
+I won't make you sit through it, but when we run it, here are the usual drunks, the numbers,
+25:32
+and I just looked at it for 1,000 and 10,000 so it would fit on the screen. You see for the usual drunk, it's 26.8, roughly 90.
+25:43
+Fair dispersion in the min and the max. And the masochistic drunk seems to be making considerably more
+25:50
+progress than the usual drunk.
+25:56
+So we see is this bias actually appears to be changing the distance.
+26:03
+Well, that's interesting. Now we could ask the question why?
+26:08
+What's going on? And to do that, I want to go and start visualizing
+26:16
+what's the trend? So rather than just looking at two numbers or three numbers,
+26:21
+as we've been doing, I'm going to draw a pretty picture. Actually, I'm not going to draw. I'm a terrible artist.
+26:27
+But Python will draw us some pretty pictures. We're going to simulate walks of multiple lengths
+26:33
+for each kind of drunk, and then plot the distance at the end of each length walk for each kind of drunk.
+26:39
+I now digress for a moment to talk about how we do plotting.
+26:46
+So we're going to use something called Pylab.
+26:51
+I've listed here four really important libraries
+26:56
+that you will surely end up using extensively
+27:01
+if you continue to use Python for research purposes. NumPy adds vectors, matrices, and many high-level
+27:10
+mathematical functions. Actually, it might be NumPy. It might be "Num-Pee." I'm not sure how to pronounce it.
+27:16
+But we'll call it NumPy. So these are really useful things. SciPy adds on top of that a bunch
+27:24
+of mathematical classes and functions useful to scientists.
+27:30
+Things like-- well, we'll look at some of them as we go on through the term. MatPlotLib adds an object-oriented programming
+27:40
+interface for plotting. Anybody here used MATLAB?
+27:45
+Great. Well you'll find that MatPlotLib is the Mat, think MATLAB.
+27:53
+Lets you, in Python, use all the plotting stuff that you've come to either like or hate in MATLAB.
+28:00
+So it's really convenient. If you know how to do plots in MATLAB, you'll know how to do it in Python.
+28:05
+PyLab combines all of these to give you a MATLAB-like interface to Python.
+28:12
+So once you have PyLab, you can do a lot of things that you would normally want to do in MATLAB,
+28:18
+for example, produce weird-looking plots like this one.
+28:23
+I'm going to show you one of the many, many plotting commands.
+28:29
+It is called plot. It takes two arguments, which must be sequences of the same length.
+28:36
+The first argument is the x-coordinates, the second argument is the y-coordinates corresponding
+28:43
+to the x ones. There are roughly three zillion optional arguments,
+28:48
+and you'll see me use only a small subset of them. It plots the points in order.
+28:55
+First the first xy, then the second xy, then the third xy.
+29:00
+Why is it important that I say it plots them in order? Because by default, as each point is plotted,
+29:08
+it draws a line connecting one point to the next point to the next point. And so the order in which they're plotted
+29:15
+will determine where the lines go. Now we'll see, as we go on, that we often don't draw the lines,
+29:21
+but by default they are drawn. Here's an example.
+29:27
+You start by importing PyLab. Then I've given xVals and yVals1, and if I call
+29:36
+pylab.plot of xVals, yVals1. Here is one of the arguments I can give it.
+29:42
+I'm saying I'd like this to be plotted in blue, b for blue, and I'd like it to be plotted as a solid line, a single dash.
+29:51
+And I want to give that line a label, which I've said is first.
+29:58
+YVals2 is a different list. I'll plot it again. Here I'm going to say I want a red dotted line,
+30:06
+and the label will be second. And then after plotting it, I'm going to invoke pylab.legend, which puts this nice little box up
+30:15
+here in the corner, in this case, saying that first is a solid blue line and second
+30:20
+a dashed red line, I should say.
+30:27
+Now again, there are lots of arguments, lots of other arguments I could give in plot. Also legend, I can tell it where to put the legend,
+30:35
+if I so choose. Here I've just said, put it wherever you happen to want to put it, or PyLab wants to put it.
+30:43
+So a very simple way to produce a plot.
+30:51
+There are lots of details and many more examples about plotting in the assigned reading.
+30:58
+We've posted a video that Professor Grimson produced for an online course, 600.1x.
+31:06
+It's about a 50 minute video broken into multiple segments about how to use plotting in PyLab with a lot more detail
+31:13
+than I've given you. You'll see if you read the code for this lecture. And as you see this lecture, there'll
+31:19
+be lots of other plots showing up of different kinds. These are my two favorite online sites
+31:26
+for finding out what to do. And of course, you can google all sorts of things.
+31:33
+That's all I'm going to tell you about how to produce plots in class, but we're going to expect
+31:39
+you to learn a lot about it, because I think it's a really useful skill. And at the very least, you should
+31:45
+feel comfortable that any plot I show you, you now-- obviously not right now--
+31:51
+but you will eventually know how to produce. So if you do these things, you'll
+31:57
+be more than up to speed.
+32:02
+So I started by saying I wanted to plot the trends in distance,
+32:08
+and they're interesting. So here's the usual drunk and the masochistic drunk.
+Distance Trends
+32:14
+So you can see, sure enough, the usual drunk, this fuschia line is progressing very slowly
+32:20
+and the masochistic drunk, considerably faster. I looked at these, and after looking at those two,
+32:28
+I tried to figure out whether there was some mathematical explanation of what
+32:33
+was going on, and decided, well, it looked to me like the usual drunk
+32:38
+was moving at about the square root of the number of steps.
+32:44
+Not so odd to think about it, if you go back to old Pythagoras here.
+32:49
+And sure enough, when I plot, and I ran this simulation up to 100,000 steps.
+32:55
+When I plot the square root of the number of steps, it's not identical, but it's pretty darn close.
+33:03
+Seems to be moving just a tad faster than the square root, but not much.
+33:08
+But who knows exactly? But pretty good. And then the masochistic drunk seems
+33:16
+to be moving at a rate of numSteps times 0.05.
+33:23
+A less intuitive answer than the square root. Why do you think it might be doing that?
+33:29
+Well, what we notice is that--
+33:38
+and we'll look at this-- maybe there's not much difference between what the masochistic drunk and the usual drunk
+33:46
+do on the x-axis, east and west. In fact, they shouldn't be.
+33:52
+But there should be a difference on the y-axis, because every time, 1/4 of the time,
+33:59
+the drunk is taking a step north of 1.1 units,
+34:05
+and 1/4 of the time, he's taking a step south of 0.9 units.
+34:11
+And so 1/2 the time, the steps are
+34:16
+diverging by a small fraction.
+34:22
+And if we think about it, 0.1 1/2 the time.
+34:28
+We divide it. We get 0.05. So at least we need to do some more analysis,
+34:36
+but the data is pretty compelling here that it's a very good fit.
+34:43
+Well, let's look at the ending location. So here you see a rather different kind of plot.
+Ending Locations
+34:49
+Here I'm showing that you can plot these things without connecting them by lines.
+34:56
+35:01
+And giving them different shapes. So what here I've said is that the masochistic drunk
+35:08
+we're going to plot using red triangles,
+35:14
+and the usual drunk I'm going to plot using black plus signs.
+35:21
+And since I'm going to plot the location
+35:27
+at the end of many walks, it doesn't make sense to draw lines connecting everything,
+35:35
+because all we're caring about here is the endpoints. So since I only want the endpoints,
+35:42
+I'm plotting them a different way. So for example, I can write something like plot( xVals,
+35:55
+yVals, and then if I do something like let's see.
+36:06
+36:12
+Just 'b0' in fact. What that says is plot blue circles.
+36:17
+I could have written--
+36:24
+in fact I did write 'k+' and that says black plus signs.
+36:33
+And I don't actually remember what I did to get the triangles, but it's in the code.
+36:41
+And so that's very flexible what you do. And as you can see here, we get the insight
+36:47
+I'd communicated earlier that if you look at east and west, not much difference between this ball and that ball.
+36:56
+They seem to be moving about the same spread, the same outliers.
+37:02
+But this ball is displaced north.
+37:07
+And not surprisingly, after 10,000 steps, you would not expect any of these points to be below zero, where you'd expect roughly half
+37:16
+of these points to be below zero.
+37:21
+And indeed that's about true. And we see here what's going on that if we
+37:28
+look at the mean absolute difference in x and y, we see that not a huge difference
+37:36
+between the usual drunk and the masochistic drunk. There happens to be a distance. But a huge difference--
+37:44
+sorry, x and x. Comparing the two y values, there's a big difference,
+37:50
+as you see here. So what's the point of all this? It's not to learn about different kinds of drunks.
+37:56
+It's to show how, by visualization, we can get insight into our data that if I just
+38:02
+printed spreadsheets showing you all of these endpoints, it would be hard to make sense of what was there.
+38:10
+So get accustomed to using plotting to help you understand data.
+38:17
+Now let's play a little bit more with the simulation. We looked at different kinds of drunks.
+38:23
+Let's look at different kinds of fields. So I want to look at a field with what
+38:29
+we'll call a wormhole in it.
+38:34
+For those of you of a certain generation, you will recognize the Tardis. So the idea here is that the field is such
+38:42
+that as you wander around it, everything is normal. But every once in a while you hit a place
+38:48
+where you're magically transported to a different place. So it behaves very peculiarly.
+38:55
+So let's call this an OddField. Not odd numbers, but odd as in strange.
+A Subclass of Field, part 1
+39:03
+So it's going to be a subclass of field. We're going to have a parameter that tells us
+39:09
+how many worm holes it has. A default value of 1,000.
+39:16
+And we'll see how we use xRange and yRange shortly.
+39:23
+So what are the first thing we do? Well, we'll call Field _init to initialize the field
+39:28
+in the usual way. And then we're going to create a dictionary of wormholes.
+39:33
+So for w in the range number of worm holes, I'm going to choose a random x and a random y
+39:41
+in xRange minus xRange to plus xRange, minus yRange to yRange.
+39:49
+So this is going to be where the worm holes are located. And then for each of those, I'm going to get a random location where you're, in some sense,
+39:57
+teleported to if you enter the wormhole. So here we're using random to get random integers.
+40:04
+We've seen that before. And so the new location will be the location of the new x and the new y, and we're
+40:14
+going to update this dictionary of wormholes to say that paired with the location x, y is newLoc.
+40:23
+40:29
+Now when we move the drunk, and again this is just changing-- we're overriding moveDrunk, so we're overriding one
+40:37
+of the methods in Field. So Field.moveDrunk will take a self and a drunk.
+A Subclass of Field, part 2
+40:46
+It's going to get the x value, the y value,
+40:51
+and if that is in the wormholes, it's going to move the drunk to the location associated
+40:57
+with that wormhole. So we move a drunk, and if the drunk ends up being in the wormhole, he gets transported.
+41:07
+So we're using Field.moveDrunk. So notice that we're using the moveDrunk of the superclass,
+41:16
+even though we're overriding it here. Because we've overridden it here, I have to say Field.
+41:21
+to indicate I want the one from the superclass, not the subclass. And then we're doing something peculiar after the move.
+41:28
+So interestingly here, I've taken,
+41:36
+I think, a usual drunk and plotted the usual drunk on a walk of 500 steps.
+41:44
+One walk, and shown all the places the drunk visited.
+41:50
+So we've seen three kinds of plots, one showing how far the drunk would get at different length
+41:56
+walks, one showing all the places
+42:01
+the drunk would end up with many walks of the same length, and here a single walk, all the places the drunk visits.
+42:10
+And as you can see, the wormholes produce a profound effect, in this case,
+42:16
+on where the drunks end up. And again, you have the code. You can run this yourself and simulate it
+42:24
+and see what you go. And I think I've set random.Seed to zero
+42:29
+in each of the simulations in the code, but you should play with it, change it,
+42:35
+to just see that you'll actually get different results with different seeds.
+42:43
+Let me summarize here, and say the point of going
+42:50
+through these random walks is not the simulations themselves,
+42:55
+but how we built them. That we started by defining the classes.
+43:02
+We then built functions corresponding to one trial, multiple trials, and reported the results.
+43:10
+And then made a set of incremental changes to the simulation so that we could investigate
+43:17
+different questions. So we started with a simple simulation
+43:23
+with just the usual drunk and the simple field, and we noticed it didn't work.
+43:31
+How did we know it? Well, not because when we did the full simulation we had great insight.
+43:38
+I probably could have fooled 1/2 of you and convinced you that that was a reasonable answer. But as soon as we went and did the sanity check, where
+43:46
+we knew the answer, we could know something was wrong.
+43:52
+And then we went and we fixed it. And then we went and we elaborated it at a step of a time. I first got a more sophistic--
+43:59
+I shouldn't say sophisticated. A different kind of drunk. And then we went to a different kind of field.
+44:07
+Finally, we spent time showing how to use plots to get an insight.
+44:13
+And in the remaining few minutes of the class, I want to go back and show you some of the plotting commands.
+44:19
+To show you how these plots were produced.
+44:25
+44:42
+So one of the things I did, since I knew I was going to be producing a lot of different plots,
+44:48
+I decided I would actually not spend time worrying about what kind of markers--
+44:56
+those are the things like the triangles and the plus sign-- or what colors for each one individually, but instead I'd set up
+45:03
+a styleIterator that would just return a bunch of different styles. So once and for all, I could define n styles,
+45:13
+and then when I want to plot a new kind of drunk, I would just call the styleIterator
+45:18
+to get the next style. So this is a fairly common kind of paradigm
+45:24
+to say that I just want to do this once and for all. I don't want to have to go through each time I do this.
+45:30
+So what do the styles look like?
+45:37
+45:43
+Let me just get this window. Oh.
+45:55
+So here it is.
+46:03
+I said there were going to be three styles that I'm going to iterate through. Style one is going to be an m, I guess
+46:12
+that's maroon with a line, a blue with a dashed line,
+46:20
+and green with a line with a comma and a minus sign.
+46:29
+So these are called the styles. And you can control the marker, if you have a marker.
+46:37
+You can control the line. You can control the color. Also you can control the size.
+46:43
+You can give the sizes of all these things. What you'll see when you look at the code
+46:50
+is I don't like the default styles things, because when they show up on the screen,
+46:57
+they're too small. So there's something called rcParams.
+47:02
+Those of you who are Unix hackers can maybe guess where that name came from. And I've just said a bunch of things,
+47:08
+like that my default line width will be four points. The size for the titles will be 20.
+47:14
+You can put titles on the graphs. Various kinds of things.
+47:20
+Again, once and for all trying to set some of these parameters
+47:26
+so they get used over and over again.
+47:38
+And then finally down here, you'll see that I did things like you want
+47:45
+to put titles on the slides. So on the graph. So here's the location at end of walk.
+47:52
+Title is just a string. You want to label your x and y-axis,
+47:58
+so I've labeled them here. And here I've said where I want the legend to appear
+48:06
+in the lower center. I've also set the y-limits and the x-limits on the axis,
+48:15
+because I wanted a little extra room. Otherwise, by default it will put points
+48:20
+right on the axes, which I find hard to read. Anyway, the point here is not that you understand
+48:27
+all of this instantaneously. The point I want to communicate is that it's very flexible.
+48:34
+And so if you decide you don't like the way a plot looks and you want to change it, and you know what you want it to look like,
+48:41
+there's almost surely a way to make it do that. So don't despair.
+48:47
+You can look at the references I gave earlier and figure that out.
+48:53
+Next lecture we're going to move on. No more random walks. We'll look at simulating other things,
+49:00
+and in particular, we'll look at the question of how believable is a simulation?
+49:07
+See you Wednesday if the world has not come to an end.

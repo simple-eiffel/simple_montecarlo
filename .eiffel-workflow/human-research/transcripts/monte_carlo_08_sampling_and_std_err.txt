@@ -1,0 +1,818 @@
+0:00
+The following content is provided under a Creative Commons license. Your support will help MIT OpenCourseWare
+0:06
+continue to offer high quality educational resources for free. To make a donation, or to view additional materials
+0:13
+from hundreds of MIT courses, visit MIT OpenCourseWare at ocw.mit.edu.
+0:18
+0:28
+PROFESSOR: Good afternoon, everybody. Welcome to Lecture 8.
+0:35
+So we're now more than halfway through the lectures. All right, the topic of today is sampling.
+0:43
+I want to start by reminding you about this whole business of inferential statistics.
+0:51
+We make references about populations by examining one or more random samples drawn
+0:56
+from that population. We used Monte Carlo simulation over the last two lectures.
+1:04
+And the key idea there, as we saw in trying to find the value of pi,
+1:09
+was that we can generate lots of random samples, and then use them to compute confidence intervals.
+1:17
+And then we use the empirical rule to say, all right, we really have good reason
+1:23
+to believe that 95% of the time we run this simulation,
+1:28
+our answer will be between here and here. Well, that's all well and good when we're doing simulations.
+1:37
+But what happens when you to actually sample something real? For example, you run an experiment,
+1:43
+and you get some data points. And it's too hard to do it over and over again.
+1:50
+Think about political polls. Here was an interesting poll.
+1:56
+How were these created? Not by simulation. They didn't run 1,000 polls and then compute
+2:04
+the confidence interval. They ran one poll-- of 835 people, in this case.
+2:12
+And yet they claim to have a confidence interval. That's what that margin of error is.
+2:17
+Obviously they needed that large confidence interval.
+2:25
+So how is this done? Backing up for a minute, let's talk about how sampling
+2:32
+is done when you are not running a simulation. You want to do what's called probability sampling, in which
+2:41
+each member of the population has a non-zero probability of being included in a sample.
+2:47
+There are, roughly speaking, two kinds.
+2:53
+We'll spend, really, all of our time on something called simple random sampling.
+Probability Sampling
+2:59
+And the key idea here is that each member of the population has an equal probability of being chosen in the sample
+3:09
+so there's no bias. Now, that's not always appropriate.
+3:14
+I do want to take a minute to talk about why. So suppose we wanted to survey MIT students to find out what
+3:25
+fraction of them are nerds-- which, by the way, I consider a compliment.
+3:31
+So suppose we wanted to consider a random sample of 100 students. We could walk around campus and choose 100 people at random.
+3:40
+And if 12% of them were nerds, we would say 12% of the MIT undergraduates are nerds--
+3:46
+if 98%, et cetera. Well, the problem with that is, let's look at the majors
+3:53
+by school. This is actually the majors at MIT by school.
+Stratified Sampling
+4:02
+And you can see that they're not exactly evenly distributed. And so if you went around and just
+4:08
+sampled 100 students at random, there'd be a reasonably high probability that they would all be
+4:14
+from engineering and science. And that might give you a misleading notion
+4:22
+of the fraction of MIT students that were nerds, or it might not.
+4:29
+In such situations we do something called stratified sampling, where we partition the population into subgroups,
+4:38
+and then take a simple random sample from each subgroup.
+4:43
+And we do that proportional to the size of the subgroups. So we would certainly want to take more students
+4:50
+from engineering than from architecture. But we probably want to make sure we got somebody
+4:56
+from architecture in our sample. This, by the way, is the way most political polls are done.
+5:03
+They're stratified. They say, we want to get so many rural people,
+5:08
+so many city people, so many minorities-- things like that.
+5:14
+And in fact, that's probably where the election recent polls were all messed up.
+5:19
+They did a very, retrospectively at least, a bad job of stratifying.
+5:26
+So we use stratified sampling when there are small groups, subgroups, that we want
+5:31
+to make sure are represented. And we want to represent them proportional to their size
+5:36
+in the population. This can also be used to reduce the needed size of the sample.
+5:44
+If we wanted to make sure we got some architecture students in our sample, we'd need to get more than 100 people to start with.
+5:52
+But if we stratify, we can take fewer samples.
+5:58
+It works well when you do it properly. But it can be tricky to do it properly.
+6:04
+And we are going to stick to simple random samples here. All right, let's look at an example.
+6:11
+So this is a map of temperatures in the United States.
+Using Sampling to Estimate Temperatures
+6:16
+And so our running example today will be sampling to get information about the average temperatures.
+6:24
+And of course, as you can see, they're highly variable. And we live in one of the cooler areas.
+6:31
+The data we're going to use is real data-- and it's in the zip file that I put up for the class--
+6:38
+from the US Centers for Environmental Information. And it's got the daily high and low temperatures
+6:44
+for 21 different American cities, every day from 1961 through 2015.
+6:53
+So it's an interesting data set-- a total of about 422,000 examples in the dataset.
+7:01
+So a fairly good sized dataset. It's fun to play with.
+7:06
+All right, so we're sort of in the part of the course
+7:11
+where the next series of lectures, including today, is going to be about data science, how to analyze data.
+7:20
+I always like to start by actually looking at the data-- not looking at all 421,000 samples,
+7:28
+but giving a plot to sort of give me a sense of what the data looks like.
+7:34
+I'm not going to walk you through the code that does this plot. I do want to point out that there are two things in it
+7:41
+that we may not have seen before.
+7:47
+Simply enough, I'm going to use numpy.std to get standard deviations instead of my own code for it.
+7:55
+And random.sample to take simple random samples
+8:02
+from the population. random.sample takes two arguments. The first is some sort of a sequence of values.
+8:10
+And the second is an integer telling you how many samples you want. And it returns a list containing sample size,
+8:18
+randomly chosen distinct elements. Distinct elements is important, because there are two ways
+8:26
+that people do sampling. You can do sampling without replacement, which is what's done here.
+8:33
+You take a sample, and then it's out of the population. So you won't draw it the next time.
+8:40
+Or you can do sampling with replacement, which allows you to draw the same sample multiple times--
+8:45
+the same example multiple times. We'll see later in the term that there are good reasons that we sometimes prefer
+8:52
+sampling with replacement. But usually we're doing sampling without replacement.
+8:57
+And that's what we'll do here. So we won't get Boston on April 3rd multiple times-- or, not
+9:04
+the same year, at least. All right. So here's the histogram the code produces.
+9:10
+You can run it yourself now, if you want, or you can run it later. And here's what it looks like.
+9:16
+The daily high temperatures, the mean is 16.3 degrees Celsius.
+9:24
+I sort of vaguely know what that feels like. And as you can see, it's kind of an interesting distribution.
+9:32
+It's not normal. But it's not that far, right?
+9:38
+We have a little tail of these cold temperatures on the left. And it is what it is.
+9:43
+It's not a normal distribution. And we'll later see that doesn't really matter. OK, so this gives me a sense.
+9:51
+The next thing I'll get is some statistics. So we know the mean is 16.3 and the standard deviation
+9:59
+is approximately 9.4 degrees.
+10:04
+So if you look at it, you can believe that. Well, here's a histogram of one random sample of size 100.
+Histogram of Random Sample of Size 100
+10:18
+Looks pretty different, as you might expect.
+10:23
+Its standard deviation is 10.4, its mean 17.7.
+10:28
+So even though the figures look a little different, in fact,
+10:34
+the means and standard deviations are pretty similar. If we look at the population mean and the sample mean--
+10:40
+and I'll try and be careful to use those terms-- they're not the same. But they're in the same ballpark.
+10:48
+And the same is true of the two standard deviations.
+10:55
+Well, that raises the question, did we get lucky or is something we should expect?
+11:04
+If we draw 100 random examples, should we
+11:09
+expect them to correspond to the population as a whole?
+11:15
+And the answer is sometimes yeah and sometimes no. And that's one of the issues I want to explore today.
+11:22
+So one way to see whether it's a happy accident is to try it 1,000 times.
+11:28
+We can draw 1,000 samples of size 100 and plot the results.
+11:33
+Again, I'm not going to go over the code. There's something in that code, as well,
+11:40
+that we haven't seen before. And that's the ax.vline plotting command.
+11:46
+V for vertical. It just, in this case, will draw a red line--
+11:52
+because I've said the color is r-- at population mean on the x-axis.
+11:57
+So just a vertical line. So that'll just show us where the mean is. If we wanted to draw a horizontal line,
+12:04
+we'd use ax.hline. Just showing you a couple of useful functions.
+12:12
+When we try it 1,000 times, here's what it looks like. So here we see what we had originally, same picture
+12:22
+I showed you before. And here's what we get when we look at the means of 100 samples.
+12:30
+So this plot on the left looks a lot more
+12:35
+like it's a normal distribution than the one on the right. Should that surprise us, or is there
+12:44
+a reason we should have expected that to happen? Well, what's the answer?
+12:50
+Someone tell me why we should have expected it. It's because of the central limit theorem, right?
+12:56
+That's exactly what the central limit theorem promised us would happen. And, sure enough, it's pretty close to normal.
+13:06
+So that's a good thing.
+13:12
+And now if we look at it, we can see that the mean of the sample means is 16.3,
+13:20
+and the standard deviation of the sample means is 0.94.
+13:28
+So if we go back to what we saw here,
+13:35
+we see that, actually, when we run it 1,000 times and look at the means, we get very
+13:43
+close to what we had initially. So, indeed, it's not a happy accident.
+13:51
+It's something we can in general expect.
+13:58
+All right, what's the 95% confidence interval here?
+14:03
+Well, it's going to be 16.28 plus or minus 1.96 times 0.94,
+14:11
+the standard deviation of the sample means. And so it tells us that the confidence interval is,
+14:18
+the mean high temperature, is somewhere between 14.5 and 18.1.
+14:26
+Well, that's actually a pretty big range, right? It's sort of enough to where you wear a sweater
+14:32
+or where you don't wear a sweater. So the good news is it includes the population mean.
+14:41
+That's nice. But the bad news is it's pretty wide.
+14:48
+Suppose we wanted it tighter bound. I said, all right, sure enough, the central limit theorem
+14:55
+is going to tell me the mean of the means is going to give me a good estimate of the actual population mean.
+15:06
+But I want it tighter bound. What can I do? Well, let's think about a couple of things we could try.
+15:15
+Well, one thing we could think about is drawing more samples.
+15:22
+Suppose instead of 1,000 samples, I'd taken 2,000 or 3,000 samples.
+15:29
+We can ask the question, would that have given me a smaller standard deviation?
+15:36
+For those of you who have not looked ahead, what do you think? Who thinks it will give you a smaller standard deviation?
+15:43
+Who thinks it won't? And the rest of you have either looked ahead
+15:48
+or refused to think. I prefer to believe you looked ahead.
+15:53
+Well, we can run the experiment. You can go to the code. And you'll see that there is a constant of 1,000, which
+16:00
+you can easily change to 2,000. And lo and behold, the standard deviation barely budges.
+16:07
+It got a little bit bigger, as it happens, but that's kind of an accident. It just, more or less, doesn't change.
+16:15
+And it won't change if I go to 3,000 or 4,000 or 5,000. It'll wiggle around.
+16:22
+But it won't help much. What we can see is doing that more often is not
+16:30
+going to help. Suppose we take larger samples?
+16:37
+Is that going to help? Who thinks that will help?
+16:43
+And who thinks it won't? OK. Well, we can again run the experiment.
+16:51
+I did run the experiment. I changed the sample size from 100 to 200.
+16:57
+And, again, you can run this if you want. And if you run it, you'll get a result-- maybe not exactly this, but something very similar-- that,
+17:05
+indeed, as I increase the size of the sample rather than the number of the samples,
+17:12
+the standard deviation drops fairly dramatically,
+17:18
+in this case from 0.94 0.66.
+17:26
+So that's a good thing. I now want to digress a little bit before we come back to this
+17:34
+and look at how you can visualize this-- Because this is a technique you'll want to use as you write papers and things like that--
+17:41
+is how do we visualize the variability of the data? And it's usually done with something called an error bar.
+17:48
+You've all seen these things here. And this is one I took from the literature.
+Error Bars, a Digression
+17:54
+This is plotting pulse rate against how much
+18:01
+exercise you do or how frequently you exercise. And what you can see here is there's definitely
+18:09
+a downward trend suggesting that the more you exercise,
+18:14
+the lower your average resting pulse. That's probably worth knowing.
+18:20
+And these error bars give us the 95% confidence intervals
+18:26
+for different subpopulations.
+18:32
+And what we can see here is that some of them overlap.
+18:38
+So, yes, once a fortnight-- two weeks for those of you who don't speak British--
+18:45
+it does get a little bit smaller than rarely or never. But the confidence interval is very big.
+18:53
+And so maybe we really shouldn't feel very comfortable that it would actually help.
+18:59
+The thing we can say is that if the confidence intervals don't overlap, we can conclude that the means are actually
+19:09
+statistically significantly different, in this case at the 95% level.
+19:15
+So here we see that the more than weekly does not overlap with the rarely or never.
+19:23
+And from that, we can conclude that this is actually, statistically true--
+19:29
+that if you exercise more than weekly, your pulse is likely to be lower than if you don't.
+19:35
+If confidence intervals do overlap, you cannot conclude that there is no statistically significant
+19:42
+difference. There might be, and you can use other tests to find out whether there are. When they don't overlap, it's a good thing.
+19:50
+We can conclude something strong. When they do overlap, we need to investigate further.
+19:57
+All right, let's look at the error bars for our temperatures. And again, we can plot those using something called
+20:03
+pylab.errorbar. Lab So what it takes is two values, the usual x-axis
+Let's Look at Error Bars for Temperatures
+20:14
+and y-axis, and then it takes another list
+20:25
+of the same length, or sequence of the same length, which is the y errors.
+20:31
+And here I'm just going to say 1.96 times the standard deviations.
+20:38
+Where these variables come from you can tell by looking at the code.
+20:43
+And then I can say the format, I want an o to show the mean, and then a label.
+20:51
+Fmt stands for format. errorbar has different keyword arguments than plot.
+20:58
+You'll find that you look at different ways like histograms and bar plots, scatterplots--
+21:04
+they all have different available keyword arguments. So you have to look up each individually.
+21:10
+But other than this, everything in the code should look very familiar to you.
+21:16
+And when I run the code, I get this.
+Sample Size and Standard Deviation
+21:22
+And so what I've plotted here is the mean against the sample
+21:29
+size with errorbars.
+21:34
+And 100 trials, in this case. So what you can see is that, as the sample size gets bigger,
+21:46
+the errorbars get smaller.
+21:52
+The estimates of the mean don't necessarily get any better. In fact, we can look here, and this is actually
+22:01
+a worse estimate, relative to the true mean, than the previous two estimates.
+22:07
+But we can have more confidence in it. The same thing we saw on Monday when we looked at estimating pi, dropping more needles
+22:16
+didn't necessarily give us a more accurate estimate. But it gave us more confidence in our estimate.
+22:22
+And the same thing is happening here. And we can see that, steadily, we can get more and more confidence.
+22:28
+So larger samples seem to be better.
+22:39
+That's a good thing. Going from a sample size of 50 to a sample size of 600
+22:46
+reduced the confidence interval, as you can see, from a fairly large confidence interval here,
+22:56
+ran from just below 14 to almost 19, as opposed to 15 and a half
+23:03
+or so to 17. I said confidence interval here.
+23:09
+I should not have. I should have said standard deviations. That's an error on the slides.
+23:15
+OK, what's the catch?
+23:20
+Well, we're now looking at 100 samples, each of size 600.
+23:27
+So we've looked at a total of 600,000 examples.
+23:36
+What has this bought us? Absolutely nothing.
+23:42
+The entire population only contained about 422,000 samples. We might as well have looked at the whole thing,
+23:51
+rather than take a few of them. So it's like, you might as well hold an election rather than ask 800 people a million times
+24:00
+who they're going to vote for. Sure, it's good. But it gave us nothing.
+24:05
+24:10
+Suppose we did it only once. Suppose we took only one sample, as we see in political polls.
+24:18
+What can we can conclude from that? And the answer is actually kind of surprising,
+24:24
+how much we can conclude, in a real mathematical sense, from one sample.
+24:30
+And, again, this is thanks to our old friend, the central limit theorem.
+24:35
+So if you recall the theorem, it had three parts. Up till now, we've exploited the first two.
+24:43
+24:48
+We've used the fact that the means will be normally distributed so that we could use the empirical rule
+24:54
+to get confidence intervals, and the fact that the mean of the sample means
+25:00
+would be close to the mean of the population. Now I want to use the third piece of it, which
+Recall Central Limit Theorem
+25:09
+is that the variance of the sample means will be close to the variance of the population divided
+25:15
+by the sample size. And we're going to use that to compute something
+25:20
+called the standard error-- formerly the standard error of the mean.
+25:27
+People often just call it the standard error. And I will be, alas, inconsistent.
+25:35
+I sometimes call it one, sometimes the other.
+25:40
+It's an incredibly simple formula. It says the standard error is going
+25:47
+to be equal to sigma, where sigma is the population
+25:53
+standard deviation divided by the square root of n, which
+26:01
+is going to be the size of the sample.
+26:09
+And then there's just this very small function that implements it. So we can compute this thing called
+26:16
+the standard error of the mean in a very straightforward way.
+26:27
+We can compute it. But does it work? What do I mean by work?
+26:34
+I mean, what's the relationship of the standard error to the standard deviation?
+26:39
+Because, remember, that was our goal, was to understand the standard deviation so we
+26:46
+could use the empirical rule. Well, let's test the standard error of the mean.
+26:52
+So here's a slightly longer piece of code. I'm going to look at a bunch of different sample sizes,
+Testing the SEM
+27:00
+from 25 to 600, 50 trials each.
+27:10
+So getHighs is just a function that returns the temperatures.
+27:15
+I'm going to get the standard deviation of the whole population, then the standard error of the means
+27:24
+and the sample standard deviations, both.
+27:29
+And then I'm just going to go through and run it. So for size and sample size, I'm going
+27:35
+to append the standard error of the mean. And remember, that uses the population standard deviation
+27:43
+and the size of the sample. So I'll compute all the SEMs.
+27:50
+And then I'm going to compute all the actual standard deviations, as well.
+27:56
+And then we'll produce a bunch of plots-- or a plot, actually.
+28:02
+All right, so let's see what that plot looks like.
+28:08
+Pretty striking. So we see the blue solid line is the standard deviation
+Standard Error of the Mean
+28:17
+of the 50 means. And the red dotted line is the standard error of the mean.
+28:26
+So we can see, quite strikingly here, that they really track each other very well.
+28:32
+And this is saying that I can anticipate
+28:41
+what the standard deviation would be by computing the standard error.
+28:47
+Which is really useful, because now I have one sample. I computed standard error.
+28:54
+And I get something very similar to what I get of the standard deviation if I took 50 samples
+29:00
+and looked at the standard deviation of those 50 samples. All right, so not obvious that this would be true, right?
+29:09
+That I could use this simple formula, and the two things would track each other so well.
+29:14
+And it's not a coincidence, by the way,
+29:20
+that as I get out here near the end, they're really lying on top of each other.
+29:26
+As the sample size gets much larger, they really will coincide.
+29:33
+So one, does everyone understand the difference between the standard deviation and the standard error?
+29:40
+No. OK. So how do we compute a standard deviation? To do that, we have to look at many samples--
+29:48
+in this case 50-- and we compute how much variation there is in those 50 samples.
+29:56
+For the standard error, we look at one sample, and we compute this thing called the standard error.
+30:03
+And we argue that we get the same number, more or less, that we would have gotten had we taken 50 samples or 100 samples
+30:12
+and computed the standard deviation. So I can avoid taking all 50 samples
+30:19
+if my only reason for doing it was to get the standard deviation. I can take one sample instead and use
+30:27
+the standard error of the mean. So going back to my temperature--
+30:32
+instead of having to look at lots of samples, I only have to look at one.
+30:38
+And I can get a confidence interval. That make sense? OK.
+30:44
+There's a catch. Notice that the formula for the standard error
+30:51
+includes the standard deviation of the population-- the standard deviation of the sample.
+31:00
+Well, that's kind of a bummer. Because how can I get the standard deviation
+31:06
+of the population without looking at the whole population? And if we're going to look at the whole population, then
+31:11
+what's the point of sampling in the first place? So we have a catch, that we've got something that's
+31:19
+a really good approximation, but it uses a value we don't know.
+31:28
+So what should we do about that? Well, what would be, really, the only obvious thing to try?
+31:39
+What's our best guess at the standard deviation of the population if we have only one sample to look at?
+31:45
+What would you use?
+31:52
+Somebody? I know I forgot to bring the candy today, so no one wants to answer any questions.
+31:57
+AUDIENCE: The standard deviation of the sample? PROFESSOR: The standard deviation of the sample. It's all I got.
+32:02
+So let's ask the question, how good is that?
+32:08
+Shockingly good. So I looked at our example here for the temperatures.
+32:15
+And I'm plotting the sample standard deviation versus the population standard deviation
+32:20
+for different sample sizes, ranging from 0 to 600 by one,
+32:28
+I think. So what you can see here is when the sample size is small,
+Sample SD vs. Population SD
+32:35
+I'm pretty far off. I'm off by 14% here. And I think that's 25.
+32:43
+But when the sample sizes is larger, say 600,
+32:48
+I'm off by about 2%.
+32:56
+So what we see, at least for this data set of temperatures--
+33:01
+if the sample size is large enough, the sample standard deviation is a pretty good approximation
+33:10
+of the population standard deviation. Well.
+33:15
+Now we should ask the question, what good is this? Well, as I said, once the sample reaches a reasonable size--
+33:26
+and we see here, reasonable is probably somewhere around 500--
+33:32
+it becomes a good approximation. But is it true only for this example?
+33:40
+The fact that it happened to work for high temperatures in the US doesn't mean
+33:46
+that it will always be true. So there are at least two things we should consider
+33:53
+to asking the question, when will this be true, when won't it be true. One is, does the distribution of the population matter?
+34:04
+So here we saw, in our very first plot, the distribution of the high temperatures.
+34:11
+And it was kind of symmetric around a point-- not perfectly.
+34:17
+But not everything looks that way, right? So we should say, well, suppose we
+34:22
+have a different distribution. Would that change this conclusion?
+34:30
+And the other thing we should ask is, well, suppose we had a different sized population.
+34:36
+Suppose instead of 400,000 temperatures I had 20 million temperatures.
+34:41
+Would I need more than 600 samples for the two things to be about the same?
+34:47
+Well, let's explore both of those questions. First, let's look at the distributions.
+34:54
+And we'll look at three common distributions-- a uniform distribution, a normal distribution,
+35:01
+and an exponential distribution. And we'll look at each of them for, what is this,
+35:07
+100,000 points. So we know we can generate a uniform distribution
+35:13
+by calling random.random. Gives me a uniform distribution of real numbers
+35:19
+between 0 and 1. We know that we can generate our normal distribution
+35:25
+by calling random.gauss. In this case, I'm looking at it between the mean of 0
+35:32
+and a standard deviation of 1. But as we saw in the last lecture, the shape will be the same, independent of these values.
+35:40
+And, finally, an exponential distribution, which we get by calling random.expovariate.
+35:46
+Very And this number, 0.5, is something
+35:52
+called lambda, which has to do with how quickly the exponential either decays or goes up,
+35:59
+depending upon which direction. And I'm not going to give you the formula for it at the moment.
+36:05
+But we'll look at the pictures. And we'll plot each of these discrete approximations
+36:11
+to these distributions. So here's what they look like.
+Three Different Distributions
+36:18
+Quite different, right? We've looked at uniform and we've looked at Gaussian before.
+36:24
+And here we see an exponential, which basically decays and will asymptote towards zero, never quite
+36:32
+getting there. But as you can see, it is certainly not
+36:38
+very symmetric around the mean. All right, so let's see what happens.
+36:47
+If we run the experiment on these three distributions,
+36:52
+each of 100,000 point examples, and look at different sample
+36:58
+sizes, we actually see that the difference between the standard deviation and the sample standard
+37:06
+deviation of the population standard deviation is not the same.
+Does Distribution Matter?
+37:11
+We see, down here--
+37:18
+this looks kind of like what we saw before. But the exponential one is really quite different.
+37:26
+You know, its worst case is up here at 25.
+37:33
+The normal is about 14. So that's not too surprising, since our temperatures
+37:40
+were kind of normally distributed when we looked at it. And the uniform is, initially, much better an approximation.
+37:51
+And the reason for this has to do
+37:56
+with a fundamental difference in these distributions, something called skew.
+38:02
+Skew is a measure of the asymmetry of a probability distribution.
+38:09
+And what we can see here is that skew actually matters.
+38:15
+The more skew you have, the more samples you're going to need to get a good approximation.
+38:25
+So if the population is very skewed, very asymmetric in the distribution, you need a lot of samples
+38:31
+to figure out what's going on. If it's very uniform, as in, for example,
+38:36
+the uniform population, you need many fewer samples.
+38:41
+OK, so that's an important thing. When we go about deciding how many samples we need,
+38:47
+we need to have some estimate of the skew in our population.
+38:52
+All right, how about size? Does size matter?
+38:59
+Shockingly-- at least it was to me the first time I looked at this-- the answer is no.
+39:09
+If we look at this-- and I'm looking just for the uniform distribution, but we'll see the same thing for all three--
+39:15
+it more or less doesn't matter.
+39:20
+39:25
+Quite amazing, right? If you have a bigger population, you don't need more samples.
+39:32
+And it's really almost counterintuitive
+39:40
+to think that you don't need any more samples to find out what's going to happen if you have a million people or 100
+39:48
+million people. And that's why, when we look at, say, political polls,
+39:54
+they're amazingly small. They poll 1,000 people and claim they're representative
+40:00
+of Massachusetts.
+40:05
+This is good news. So to estimate the mean of a population, given
+40:11
+a single sample, we choose a sample size based upon some estimate of skew in the population.
+40:19
+This is important, because if we get that wrong,
+40:25
+we might choose a sample size that is too small. And in some sense, you always want
+40:30
+to choose the smallest sample size you can that will give you an accurate answer, because it's
+40:36
+more economical to have small samples than big samples. And I've been talking about polls,
+40:43
+but the same is true in an experiment. How many pieces of data do you need to collect when you run an experiment in a lab.
+40:52
+And how much will depend, again, on the skew of the data. And that will help you decide.
+41:00
+When you know the size, you choose a random sample from the population.
+41:09
+Then you compute the mean and the standard deviation of that sample.
+41:17
+And then use the standard deviation of that sample to estimate the standard error.
+41:23
+And I want to emphasize that what you're getting here is an estimate of the standard error, not the standard error
+41:30
+itself, which would require you to know the population standard deviation.
+41:36
+But if you've chosen the sample size to be appropriate, this will turn out to be a good estimate.
+41:44
+And then once we've done that, we use the estimated standard error to generate confidence intervals around the sample mean.
+41:52
+And we're done. Now this works great when we choose
+41:57
+independent random samples. And, as we've seen before, that if you
+42:04
+don't choose independent samples, it doesn't work so well.
+42:10
+And, again, this is an issue where if you assume that, in an election, each state is independent
+42:15
+of every other state, and you'll get the wrong answer, because they're not.
+42:23
+All right, let's go back to our temperature example and pose a simple question.
+42:30
+Are 200 samples enough? I don't know why I chose 200. I did.
+42:36
+So we'll do an experiment here. This is similar to an experiment we saw on Monday.
+42:44
+So I'm starting with the number of mistakes I make. For t in a range number of trials,
+42:50
+sample will be random.sample of the temperatures in the sample size.
+42:56
+This is a key step. The first time I did this, I messed it up.
+43:04
+And instead of doing this very simple thing, I did a more complicated thing of just choosing
+43:10
+some point in my list of temperatures and taking the next 200 temperatures.
+43:16
+Why did that give me the wrong answer? Because it's organized by city.
+43:24
+So if I happen to choose the first day of Phoenix, all 200 temperatures were Phoenix--
+43:30
+which is not a very good approximation of the temperature in the country as a whole. But this will work.
+43:36
+I'm using random.sample. I'll then get the sample mean.
+43:43
+Then I'll compute my estimate of the standard error by taking that as seen here.
+43:49
+And then if the absolute value of the population
+43:55
+minus the sample mean is more than 1.96 standard errors,
+44:01
+I'm going to say I messed up. It's outside.
+44:07
+And then at the end, I'm going to look at the fraction outside the 95% confidence intervals.
+44:14
+And what do I hope it should print? What would be the perfect answer when I run this?
+44:20
+44:26
+What fraction should lie outside that?
+44:34
+It's a pretty simple calculation.
+44:44
+Five, right? Because if they all were inside, then
+44:49
+I'm being too conservative in my interval, right? I want 5% of the tests to fall outside the 95% confidence
+44:58
+interval. If I wanted fewer, then I would look at three standard deviations.
+45:04
+Instead of 1.96, then I would expect less than 1% to fall outside.
+45:10
+So this is something we have to always keep in mind when we do this kind of thing. If your answer is too good, you've messed up.
+45:19
+Shouldn't be too bad, but it shouldn't be too good, either. That's what probabilities are all about.
+45:25
+If you called every election correctly, then your math is wrong.
+45:33
+Well, when we run this, we get this lovely answer,
+45:40
+that the fraction outside the 95% confidence interval is 0.0511.
+45:49
+That's exactly-- well, close to what you want. It's almost exactly 5%.
+45:55
+And if I run it multiple times, I get slightly different numbers. But they're all in that range, showing that, here,
+46:03
+in fact, it really does work.
+46:08
+So that's what I want to say, and it's really important, this notion of the standard error.
+46:15
+When I talk to other departments about what we should cover in 60002, about the only thing everybody
+46:22
+agrees on was we should talk about standard error. So now I hope I have made everyone happy.
+46:29
+And we will talk about fitting curves to experimental data starting next week.
+46:35
+All right, thanks a lot.

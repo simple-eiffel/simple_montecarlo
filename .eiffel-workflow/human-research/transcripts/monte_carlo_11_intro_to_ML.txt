@@ -1,0 +1,956 @@
+0:00
+The following content is provided under a Creative Commons license. Your support will help MIT OpenCourseWare
+0:06
+continue to offer high quality educational resources for free. To make a donation or to view additional materials
+0:13
+from hundreds of MIT courses, visit MIT OpenCourseWare at ocw.mit.edu.
+0:30
+ERIC GRIMSON: OK. Welcome back. You know, it's that time a term when
+0:36
+we're all kind of doing this. So let me see if I can get a few smiles by simply noting to you
+0:41
+that two weeks from today is the last class. Should be worth at least a little bit of a smile, right?
+0:48
+Professor Guttag is smiling. He likes that idea. You're almost there.
+0:53
+What are we doing for the last couple of lectures? We're talking about linear regression. And I just want to remind you, this
+0:59
+was the idea of I have some experimental data. Case of a spring where I put different weights on measure
+1:06
+displacements. And regression was giving us a way of deducing a model
+1:11
+to fit that data. And In some cases it was easy. We knew, for example, it was going to be a linear model.
+1:17
+We found the best line that would fit that data. In some cases, we said we could use validation to actually let us explore to find the best model that
+1:24
+would fit it, whether a linear, a quadratic, a cubic, some higher order thing.
+1:31
+So we'll be using that to deduce something about a model. That's a nice segue into the topic for the next three
+1:39
+lectures, the last big topic of the class, which is machine learning. And I'm going to argue, you can debate whether that's actually
+1:46
+an example of learning. But it has many of the elements that we want to talk about when we talk about machine learning.
+1:52
+So as always, there's a reading assignment. Chapter 22 of the book gives you a good start on this, and it will follow up with other pieces.
+2:00
+And I want to start by basically outlining what we're going to do. And I'm going to begin by saying,
+2:05
+as I'm sure you're aware, this is a huge topic. I've listed just five subjects in course six
+2:12
+that all focus on machine learning. And that doesn't include other subjects where learning is a central part.
+2:19
+So natural language processing, computational biology, computer vision robotics all rely today,
+2:25
+heavily on machine learning. And you'll see those in those subjects as well. So we're not going to compress five subjects
+2:32
+into three lectures. But what we are going to do is give you the introduction. We're going to start by talking about the basic concepts
+2:39
+of machine learning. The idea of having examples, and how do you talk about features representing those examples, how do
+2:45
+you measure distances between them, and use the notion of distance to try and group similar things together as a way
+2:52
+of doing machine learning. And we're going to look, as a consequence, of two different standard ways of doing learning.
+2:59
+One, we call classification methods. Example we're going to see, there is something called "k nearest neighbor"
+3:05
+and the second class, called clustering methods. Classification works well when I have what
+3:10
+we would call labeled data. I know labels on my examples, and I'm going to use that to try and define classes
+3:17
+that I can learn, and clustering working well, when I don't have labeled data. And we'll see what that means in a couple of minutes.
+3:23
+But we're going to give you an early view of this. Unless Professor Guttag changes his mind,
+3:29
+we're probably not going to show you the current really sophisticated machine learning methods like convolutional neural nets or deep learning,
+3:35
+things you'll read about in the news. But you're going to get a sense of what's behind those, by looking at what we do when we talk about learning algorithms.
+3:43
+Before I do it, I want to point out to you just how prevalent this is. And I'm going to admit with my gray hair,
+3:49
+I started working in AI in 1975 when machine learning was a pretty simple thing to do.
+3:55
+And it's been fascinating to watch over 40 years, the change. And if you think about it, just think about where you see it.
+4:01
+AlphaGo, machine learning based system from Google that beat
+4:06
+a world-class level Go player. Chess has already been conquered by computers for a while.
+4:11
+Go now belongs to computers. Best Go players in the world are computers. I'm sure many of you use Netflix.
+4:18
+Any recommendation system, Netflix, Amazon, pick your favorite, uses a machine learning algorithm
+4:23
+to suggest things for you. And in fact, you've probably seen it on Google, right? The ads that pop up on Google are
+4:29
+coming from a machine learning algorithm that's looking at your preferences. Scary thought.
+4:34
+Drug discovery, character recognition-- the post office does character recognition of handwritten characters using
+4:41
+a machine learning algorithm and a computer vision system behind it. You probably don't know this company.
+4:48
+It's actually an MIT spin-off called Two Sigma, it's a hedge fund in New York. They heavily use AI and machine learning techniques.
+4:54
+And two years ago, their fund returned a 56% return.
+5:01
+I wish I'd invested in the fund. I don't have the kinds of millions you need, but that's an impressive return. 56% return on your money in one year.
+5:09
+Last year they didn't do quite as well, but they do extremely well using machine learning techniques. Siri.
+5:16
+Another great MIT company called Mobileye that does computer vision systems with a heavy machine learning component that is used in assistive driving
+5:24
+and will be used in completely autonomous driving. It will do things like kick in your brakes if you're closing too fast on the car in front of you,
+5:32
+which is going to be really bad for me because I drive like a Bostonian. And it would be kicking in constantly.
+5:38
+Face recognition. Facebook uses this, many other systems do to both detect and recognize faces.
+5:46
+IBM Watson-- cancer diagnosis. These are all just examples of machine learning being used everywhere.
+5:52
+And it really is. I've only picked nine. So what is it?
+6:00
+I'm going to make an obnoxious statement. You're now used to that. I'm going to claim that you could argue that almost every computer program learns something.
+6:09
+But the level of learning really varies a lot. So if you think back to the first lecture in 60001,
+6:15
+we showed you Newton's method for computing square roots. And you could argue, you'd have to stretch it,
+6:20
+but you could argue that that method learns something about how to compute square roots. In fact, you could generalize it to roots of any order power.
+6:29
+But it really didn't learn. I really had to program it. All right. Think about last week when we talked about linear regression.
+6:37
+Now it starts to feel a little bit more like a learning algorithm. Because what did we do? We gave you a set of data points,
+6:44
+mass displacement data points. And then we showed you how the computer could essentially
+6:49
+fit a curve to that data point. And it was, in some sense, learning a model for that data
+6:56
+that it could then use to predict behavior. In other situations. And that's getting closer to what
+7:01
+we would like when we think about a machine learning algorithm. We'd like to have program that can learn from experience,
+7:10
+something that it can then use to deduce new facts. Now it's been a problem in AI for a very long time.
+7:16
+And I love this quote. It's from a gentleman named Art Samuel. 1959 is the quote in which he says,
+7:24
+his definition of machine learning is the field of study that gives computers the ability to learn without being explicitly programmed.
+7:32
+And I think many people would argue, he wrote the first such program. It learned from experience.
+7:38
+In his case, it played checkers. Kind of shows you how the field has progressed. But we started with checkers, we got to chess, we now do Go.
+7:45
+But it played checkers. It beat national level players, most importantly, it learned to improve its methods
+7:52
+by watching how it did in games and then inferring something to change what it thought about as it did that.
+7:58
+Samuel did a bunch of other things. I just highlighted one. You may see in a follow on course, he invented what's called Alpha-Beta Pruning, which
+8:04
+is a really useful technique for doing search. But the idea is, how can we have the computer learn
+8:10
+without being explicitly programmed? And one way to think about this is to think about the difference between how we would normally
+8:17
+program and what we would like from a machine learning algorithm. Normal programming, I know you're not convinced
+8:23
+there's such a thing as normal programming, but if you think of traditional programming, what's the process?
+8:30
+I write a program that I input to the computer so that it can then take data and produce
+8:36
+some appropriate output. And the square root finder really sits there, right? I wrote code for using Newton method to find a square root,
+8:43
+and then it gave me the process of given any number, I'll give you the square root.
+8:50
+But if you think about what we did last time, it was a little different. And in fact, in a machine learning approach,
+8:56
+the idea is that I'm going to give the computer output. I'm going to give it examples of what I want the program to do,
+9:05
+labels on data, characterizations of different classes of things. And what I want the computer to do
+9:11
+is, given that characterization of output and data, I wanted that machine learning algorithm
+9:17
+to actually produce for me a program, a program that I can then use to infer
+9:23
+new information about things. And that creates, if you like, a really nice loop
+9:29
+where I can have the machine learning algorithm learn the program which I can then use to solve some other problem.
+9:36
+That would be really great if we could do it. And as I suggested, that curve-fitting algorithm is a simple version of that.
+9:41
+It learned a model for the data, which I could then use to label any other instances of the data or predict what I would see in terms of spring displacement
+9:49
+as I changed the masses. So that's the kind of idea we're going to explore.
+9:54
+If we want to learn things, we could also ask, so how do you learn? And how should a computer learn?
+10:02
+Well, for you as a human, there are a couple of possibilities. This is the boring one. This is the old style way of doing it, right?
+10:08
+Memorize facts. Memorize as many facts as you can and hope that we ask you on the final exam instances of those facts,
+10:16
+as opposed to some other facts you haven't memorized. This is, if you think way back to the first lecture,
+10:22
+an example of declarative knowledge, statements of truth. Memorize as many as you can.
+10:28
+Have Wikipedia in your back pocket. Better way to learn is to be able to infer, to deduce
+10:35
+new information from old. And if you think about this, this gets closer to what we called imperative knowledge--
+10:42
+ways to deduce new things. Now, in the first cases, we built
+10:48
+that in when we wrote that program to do square roots. But what we'd like in a learning algorithm
+10:53
+is to have much more like that generalization idea. We're interested in extending our capabilities
+10:59
+to write programs that can infer useful information from implicit patterns in the data.
+11:06
+So not something explicitly built like that comparison of weights and displacements,
+11:11
+but actually implicit patterns in the data, and have the algorithm figure out what those patterns are,
+11:16
+and use those to generate a program you can use to infer new data about objects,
+11:22
+about string displacements, whatever it is you're trying to do.
+11:27
+OK. So the idea then, the basic paradigm that we're going to see, is we're
+11:32
+going to give the system some training data, some observations. We did that last time with just the spring displacements.
+11:41
+We're going to then try and have a way to figure out, how do we write code, how do we write a program, a system that will infer something
+11:47
+about the process that generated the data? And then from that, we want to be
+11:53
+able to use that to make predictions about things we haven't seen before. So again, I want to drive home this point.
+11:59
+If you think about it, the spring example fit that model.
+12:04
+I gave you a set of data, spatial deviations relative to mass displacements. For different masses, how far did the spring move?
+12:12
+I then inferred something about the underlying process. In the first case, I said I know it's linear,
+12:18
+but let me figure out what the actual linear equation is. What's the spring constant associated with it?
+12:24
+And based on that result, I got a piece of code I could use to predict new displacements.
+12:30
+So it's got all of those elements, training data, an inference engine, and then the ability
+12:35
+to use that to make new predictions. But that's a very simple kind of learning setting.
+12:40
+So the more common one is one I'm going to use as an example, which is, when I give you a set of examples,
+12:47
+those examples have some data associated with them, some features and some labels.
+12:52
+For each example, I might say this is a particular kind of thing. This other one is another kind of thing.
+12:58
+And what I want to do is figure out how to do inference on labeling new things. So it's not just, what's the displacement of the mass,
+13:04
+it's actually a label. And I'm going to use one of my favorite examples. I'm a big New England Patriots fan,
+13:09
+if you're not, my apologies. But I'm going to use football players. So I'm going to show you in a second,
+13:15
+I'm going to give you a set of examples of football players. The label is the position they play.
+13:20
+And the data, well, it could be lots of things. We're going to use height and weight. But what we want to do is then see
+13:25
+how would we come up with a way of characterizing the implicit pattern of how does weight and height predict
+13:32
+the kind of position this player could play. And then come up with an algorithm that will predict the position of new players.
+13:38
+We'll do the draft for next year. Where do we want them to play? That's the paradigm.
+13:44
+Set of observations, potentially labeled, potentially not. Think about how do we do inference to find a model.
+13:51
+And then how do we use that model to make predictions. What we're going to see, and we're going to see multiple examples today,
+13:57
+is that that learning can be done in one of two very broad ways. The first one is called supervised learning.
+14:05
+And in that case, for every new example I give you as part of the training data, I have a label on it.
+14:11
+I know the kind of thing it is. And what I'm going to do is look for how do I find a rule that would predict the label associated
+14:18
+with unseen input based on those examples. It's supervised because I know what the labeling is.
+14:25
+Second kind, if this is supervised, the obvious other one is called unsupervised. In that case, I'm just going to give you a bunch of examples.
+14:32
+But I don't know the labels associated with them. I'm going to just try and find what are the natural ways to group those examples
+14:39
+together into different models. And in some cases, I may know how many models are there.
+14:44
+In some cases, I may want to just say what's the best grouping I can find. OK.
+14:50
+What I'm going to do today is not a lot of code. I was expecting cheers for that, John, but I didn't get them. Not a lot of code.
+14:57
+What I'm going to do is show you basically, the intuitions behind doing this learning. And I"m going to start with my New England Patriots example.
+15:03
+So here are some data points about current Patriots players. And I've got two kinds of positions.
+15:09
+I've got receivers, and I have linemen. And each one is just labeled by the name, the height in inches,
+15:15
+and the weight in pounds. OK? Five of each.
+15:20
+If I plot those on a two dimensional plot, this is what I get.
+15:26
+OK? No big deal. What am I trying to do? I'm trying to learn, are their characteristics
+15:33
+that distinguish the two classes from one another? And in the unlabeled case, all I have are just a set of examples.
+15:40
+So what I want to do is decide what makes two players similar with the goal of seeing,
+15:46
+can I separate this distribution into two or more natural groups.
+15:52
+Similar is a distance measure. It says how do I take two examples with values or features associated, and we're
+15:57
+going to decide how far apart are they? And in the unlabeled case, the simple way to do it is to say,
+16:03
+if I know that there are at least k groups there-- in this case, I'm going to tell you there are two different groups there--
+16:09
+how could I decide how best to cluster things together so that all the examples in one group
+16:15
+are close to each other, all the examples in the other group are close to each other, and they're reasonably far apart.
+16:22
+There are many ways to do it. I'm going to show you one. It's a very standard way, and it works, basically, as follows.
+16:29
+If all I know is that there are two groups there, I'm going to start by just picking two examples as my exemplars.
+16:37
+Pick them at random. Actually at random is not great. I don't want to pick too closely to each other. I'm going to try and pick them far apart.
+16:42
+But I pick two examples as my exemplars. And for all the other examples in the training data,
+16:47
+I say which one is it closest to. What I'm going to try and do is create clusters
+16:52
+with the property that the distances between all of the examples of that cluster are small.
+16:57
+The average distance is small. And see if I can find clusters that gets the average distance for both clusters
+17:03
+as small as possible. This algorithm works by picking two examples, clustering all the other examples by simply saying
+17:10
+put it in the group to which it's closest to that example.
+17:15
+Once I've got those clusters, I'm going to find the median element of that group. Not mean, but median, what's the one closest to the center?
+17:24
+And treat those as exemplars and repeat the process. And I'll just do it either some number of times
+17:30
+or until I don't get any change in the process. So it's clustering based on distance.
+17:35
+And we'll come back to distance in a second. So here's what would have my football players.
+17:40
+If I just did this based on weight, there's the natural dividing line. And it kind of makes sense.
+17:46
+All right? These three are obviously clustered, and again, it's just on this axis. They're all down here.
+17:51
+These seven are at a different place. There's a natural dividing line there. If I were to do it based on height, not as clean.
+18:01
+This is what my algorithm came up with as the best dividing line here, meaning that these four, again, just based on this axis
+18:09
+are close together. These six are close together. But it's not nearly as clean. And that's part of the issue we'll look at
+18:15
+is how do I find the best clusters. If I use both height and weight, I
+18:22
+get that, which was actually kind of nice, right? Those three cluster together. they're near each other,
+18:28
+in terms of just distance in the plane. Those seven are near each other. There's a nice, natural dividing line through here.
+18:36
+And in fact, that gives me a classifier. This line is the equidistant line
+18:43
+between the centers of those two clusters. Meaning, any point along this line is the same distance to the center of that group
+18:49
+as it is to that group. And so any new example, if it's above the line, I would say gets that label, if it's below the line,
+18:56
+gets that label. In a second, we'll come back to look at how do we measure the distances,
+19:01
+but the idea here is pretty simple. I want to find groupings near each other and far apart from the other group.
+19:09
+Now suppose I actually knew the labels on these players.
+19:16
+These are the receivers. Those are the linemen. And for those of you who are football fans,
+19:22
+you can figure it out, right? Those are the two tight ends. They are much bigger. I think that's Bennett and that's Gronk if you're really
+19:28
+a big Patriots fan. But those are tight ends, those are wide receivers, and it's going to come back in a second, but there are the labels.
+19:34
+Now what I want to do is say, if I could take advantage of knowing the labels, how would I divide these groups up?
+19:40
+And that's kind of easy to see. Basic idea, in this case, is if I've got labeled groups in that feature
+19:46
+space, what I want to do is find a subsurface that naturally divides that space.
+19:52
+Now subsurface is a fancy word. It says, in the two-dimensional case, I want to know what's the best line,
+19:58
+if I can find a single line, that separates all the examples with one label from all the examples of the second label.
+20:04
+We'll see that, if the examples are well separated, this is easy to do, and it's great.
+20:09
+But in some cases, it's going to be more complicated because some of the examples may be very close to one another.
+20:15
+And that's going to raise a problem that you saw last lecture. I want to avoid overfitting.
+20:20
+I don't want to create a really complicated surface to separate things. And so we may have to tolerate a few incorrectly
+20:27
+labeled things, if we can't pull it out. And as you already figured out, in this case,
+20:32
+with the labeled data, there's the best fitting line right there. Anybody over 280 pounds is going to be a great lineman.
+20:40
+Anybody under 280 pounds is more likely to be a receiver.
+20:45
+OK. So I've got two different ways of trying to think about doing this labeling. I'm going to come back to both of them in a second.
+20:52
+Now suppose I add in some new data. I want to label new instances.
+20:57
+Now these are actually players of a different position. These are running backs. But I say, all I know about is receivers and linemen.
+21:04
+I get these two new data points. I'd like to know, are they more likely to be a receiver or a linemen?
+21:11
+And there's the data for these two gentlemen. So if I go back to now plotting them,
+21:17
+oh you notice one of the issues. So there are my linemen, the red ones are my receivers, the two black dots are the two running backs.
+21:25
+And notice right here. It's going to be really hard to separate those two
+21:31
+examples from one another. They are so close to each other. And that's going to be one of the things we have to trade off.
+21:37
+But if I think about using what I learned as a classifier with unlabeled data, there were my two clusters.
+21:46
+Now you see, oh, I've got an interesting example. This new example I would say is clearly more
+21:51
+like a receiver than a lineman. But that one there, unclear.
+21:57
+Almost exactly lies along that dividing line between those two clusters. And I would either say, I want to rethink the clustering
+22:04
+or I want to say, you know what? As I know, maybe there aren't two clusters here. Maybe there are three.
+22:10
+And I want to classify them a little differently. So I'll come back to that.
+22:15
+On the other hand, if I had used the labeled data, there was my dividing line. This is really easy.
+22:21
+Both of those new examples are clearly below the dividing line. They are clearly examples that I would
+22:27
+categorize as being more like receivers than they are like linemen.
+22:32
+And I know it's a football example. If you don't like football, pick another example. But you get the sense of why I can
+22:38
+use the data in a labeled case and the unlabeled case to come up with different ways of building the clusters.
+22:45
+So what we're going to do over the next 2 and 1/2 lectures is look at how can we write code to learn that way of separating things out?
+22:54
+We're going to learn models based on unlabeled data. That's the case where I don't know what the labels are, by simply trying to find ways to cluster things together
+23:02
+nearby, and then use the clusters to assign labels to new data. And we're going to learn models by looking at labeled data
+23:09
+and seeing how do we best come up with a way of separating with a line or a plane or a collection of lines, examples
+23:17
+from one group, from examples of the other group. With the acknowledgment that we want to avoid overfitting,
+23:23
+we don't want to create a really complicated system. And as a consequence, we're going to have to make some trade-offs between what
+23:28
+we call false positives and false negatives. But the resulting classifier can then label any new data
+23:34
+by just deciding where you are with respect to that separating line.
+23:40
+So here's what you're going to see over the next 2 and 1/2 lectures. Every machine learning method has five essential components.
+23:49
+We need to decide what's the training data, and how are we going to evaluate the success of that system. We've already seen some examples of that.
+23:56
+We need to decide how are we going to represent each instance that we're giving it.
+24:02
+I happened to choose height and weight for football players. But I might have been better off to pick average speed
+24:08
+or, I don't know, arm length, something else. How do I figure out what are the right features. And associated with that, how do I measure distances
+24:15
+between those features? How do I decide what's close and what's not close? Maybe it should be different, in terms of weight versus height,
+24:22
+for example. I need to make that decision. And those are the two things we're going to show you examples of today, how to go through that.
+24:30
+Starting next week, Professor Guttag is going to show you how you take those and actually start building more detailed versions of measuring clustering,
+24:38
+measuring similarities to find an objective function that you want to minimize to decide what is the best cluster to use.
+24:44
+And then what is the best optimization method you want to use to learn that model.
+24:50
+So let's start talking about features. I've got a set of examples, labeled or not.
+24:56
+I need to decide what is it about those examples that's useful to use when I want to decide what's
+25:02
+close to another thing or not. And one of the problems is, if it was really easy, it would be really easy.
+25:09
+Features don't always capture what you want. I'm going to belabor that football analogy, but why did I pick height and weight.
+25:16
+Because it was easy to find. You know, if you work for the New England Patriots, what is the thing that you really look for when you're asking,
+25:22
+what's the right feature? It's probably some other combination of things. So you, as a designer, have to say what are the features I want to use.
+25:29
+That quote, by the way, is from one of the great statisticians of the 20th century, which I think captures it well.
+25:35
+So feature engineering, as you, as a programmer, comes down to deciding both what are the features
+25:42
+I want to measure in that vector that I'm going to put together, and how do I decide relative ways to weight it?
+25:49
+So John, and Ana, and I could have made our job
+25:55
+this term really easy if we had sat down at the beginning of the term and said, you know, we've taught this course many times.
+26:01
+We've got data from, I don't know, John, thousands of students, probably over this time. Let's just build a little learning algorithm
+26:07
+that takes a set of data and predicts your final grade. You don't have to come to class, don't
+26:12
+have to go through all the problems, because we'll just predict your final grade. Wouldn't that be nice? Make our job a little easier, and you may or may not
+26:18
+like that idea. But I could think about predicting that grade? Now why am I telling this example.
+26:24
+I was trying to see if I could get a few smiles. I saw a couple of them there. But think about the features.
+26:30
+What I measure? Actually, I'll put this on John because it's his idea. What would he measure?
+26:35
+Well, GPA is probably not a bad predictor of performance.
+26:41
+You do well in other classes, you're likely to do well in this class. I'm going to use this one very carefully.
+26:47
+Prior programming experience is at least a predictor, but it is not a perfect predictor.
+26:53
+Those of you who haven't programmed before, in this class, you can still do really well in this class. But it's an indication that you've seen other programming
+26:59
+languages. On the other hand, I don't believe in astrology. So I don't think the month in which you're born,
+27:06
+the astrological sign under which you were born has probably anything to do with how well you'd program.
+27:12
+I doubt that eye color has anything to do with how well you'd program. You get the idea. Some features matter, others don't.
+27:19
+Now I could just throw all the features in and hope that the machine learning algorithm sorts out those it wants
+27:25
+to keep from those it doesn't. But I remind you of that idea of overfitting. If I do that, there is the danger
+27:32
+that it will find some correlation between birth month, eye color, and GPA.
+27:39
+And that's going to lead to a conclusion that we really don't like. By the way, in case you're worried,
+27:44
+I can assure you that Stu Schmill in the dean of admissions department does not use machine learning to pick you.
+27:50
+He actually looks at a whole bunch of things because it's not easy to replace him with a machine-- yet.
+27:56
+All right. So what this says is we need to think about how do we pick the features. And mostly, what we're trying to do
+28:02
+is to maximize something called the signal to noise ratio. Maximize those features that carry the most information,
+28:09
+and remove the ones that don't. So I want to show you an example of how you might think about this.
+28:17
+I want to label reptiles. I want to come up with a way of labeling animals as,
+28:22
+are they a reptile or not. And I give you a single example. With a single example, you can't really do much.
+28:28
+But from this example, I know that a cobra, it lays eggs, it has scales, it's poisonous, it's cold blooded,
+28:35
+it has no legs, and it's a reptile. So I could say my model of a reptile is well, I'm not certain.
+28:40
+I don't have enough data yet. But if I give you a second example, and it also happens to be egg-laying,
+28:47
+have scales, poisonous, cold blooded, no legs. There is my model, right? Perfectly reasonable model, whether I design it
+28:53
+or a machine learning algorithm would do it says, if all of these are true, label it as a reptile.
+29:00
+OK? And now I give you a boa constrictor.
+29:05
+Ah. It's a reptile. But it doesn't fit the model.
+29:11
+And in particular, it's not egg-laying, and it's not poisonous.
+29:16
+So I've got to refine the model. Or the algorithm has got to refine the model. And this, I want to remind you, is looking at the features.
+29:21
+So I started out with five features. This doesn't fit. So probably what I should do is reduce it.
+29:28
+I'm going to look at scales. I'm going to look at cold blooded. I'm going to look at legs. That captures all three examples.
+29:34
+Again, if you think about this in terms of clustering, all three of them would fit with that.
+29:39
+OK. Now I give you another example-- chicken. I don't think it's a reptile.
+29:45
+In fact, I'm pretty sure it's not a reptile. And it nicely still fits this model, right?
+29:53
+Because, while it has scales, which you may or not realize, it's not cold blooded, and it has legs.
+29:58
+So it is a negative example that reinforces the model. Sounds good.
+30:04
+And now I'll give you an alligator. It's a reptile.
+30:09
+And oh fudge, right? It doesn't satisfy the model. Because while it does have scales and it is cold blooded,
+30:19
+it has legs. I'm almost done with the example. But you see the point. Again, I've got to think about how do I refine this.
+30:25
+And I could by saying, all right. Let's make it a little more complicated-- has scales,
+30:30
+cold blooded, 0 or four legs-- I'm going to say it's a reptile.
+30:36
+I'll give you the dart frog. Not a reptile, it's an amphibian. And that's nice because it still satisfies this.
+30:43
+So it's an example outside of the cluster that says no scales, not cold blooded,
+30:50
+but happens to have four legs. It's not a reptile. That's good. And then I give you-- I have to give you a python, right?
+30:56
+I mean, there has to be a python in here. Oh come on. At least grown at me when I say that. There has to be a python here.
+31:02
+And I give you that and a salmon. And now I am in trouble.
+31:08
+Because look at scales, look at cold blooded, look at legs.
+31:14
+I can't separate them. On those features, there's no way to come up with a way that will correctly
+31:20
+say that the python is a reptile and the salmon is not. And so there's no easy way to add in that rule.
+31:28
+And probably my best thing is to simply go back to just two features, scales and cold blooded.
+31:34
+And basically say, if something has scales and it's cold blooded, I'm going to call it a reptile. If it doesn't have both of those,
+31:40
+I'm going to say it's not a reptile. It won't be perfect. It's going to incorrectly label the salmon.
+31:45
+But I've made a design choice here that's important. And the design choice is that I will have no false negatives.
+31:54
+What that means is there's not going to be any instance of something that's not a reptile that I'm
+31:59
+going to call a reptile. I may have some false positives. So I did that the wrong way.
+32:05
+A false negative says, everything that's not a reptile I'm going to categorize that direction. I may have some false positives, in that,
+32:11
+I may have a few things that I will incorrectly label as a reptile. And in particular, salmon is going
+32:17
+to be an instance of that. This trade off of false positives and false negatives is something that we worry about, as we think about it.
+32:24
+Because there's no perfect way, in many cases, to separate out the data. And if you think back to my example of the New England
+32:30
+Patriots, that running back and that wide receiver were so close together in height and weight, there was no way I'm going to be able to separate them apart.
+32:38
+And I just have to be willing to decide how many false positives or false negatives do I want to tolerate.
+32:45
+Once I've figured out what features to use, which is good, then I have to decide about distance.
+32:52
+How do I compare two feature vectors? I'm going to say vector because there could be multiple dimensions to it. How do I decide how to compare them?
+32:58
+Because I want to use the distances to figure out either how to group things together or how to find a dividing line
+33:03
+that separates things apart. So one of the things I have to decide is which features.
+33:09
+I also have to decide the distance. And finally, I may want to decide how to weigh relative importance of different dimensions
+33:16
+in the feature vector. Some may be more valuable than others in making that decision. And I want to show you an example of that.
+33:24
+So let's go back to my animals. I started off with a feature vector that actually
+33:29
+had five dimensions to it. It was egg-laying, cold blooded, has scales,
+33:36
+I forget what the other one was, and number of legs. So one of the ways I could think about this
+33:41
+is saying I've got four binary features and one integer feature associated with each animal.
+33:48
+And one way to learn to separate out reptiles from non reptiles is to measure the distance between pairs of examples
+33:56
+and use that distance to decide what's near each other and what's not. And as we've said before, it will either be used to cluster things or to find a classifier surface that
+34:04
+separates them. So here's a simple way to do it. For each of these examples, I'm going to just let true
+34:11
+be 1, false be 0. So the first four are either 0s or 1s. And the last one is the number of legs.
+34:17
+And now I could say, all right. How do I measure distances between animals or anything else, but these kinds of feature vectors?
+34:25
+Here, we're going to use something called the Minkowski Metric or the Minkowski difference. Given two vectors and a power, p,
+34:34
+we basically take the absolute value of the difference between each of the components of the vector, raise it to the p-th power, take the sum,
+34:43
+and take the p-th route of that. So let's do the two obvious examples. If p is equal to 1, I just measure the absolute distance
+34:51
+between each component, add them up, and that's my distance. It's called the Manhattan metric.
+34:58
+The one you've seen more, the one we saw last time, if p is equal to 2, this is Euclidean distance, right?
+35:03
+It's the sum of the squares of the differences of the components. Take the square root. Take the square root because it makes
+35:09
+it have certain properties of a distance. That's the Euclidean distance.
+35:16
+So now if I want to measure difference between these two, here's the question.
+35:22
+Is this circle closer to the star or closer to the cross?
+35:27
+Unfortunately, I put the answer up here. But it differs, depending on the metric I use.
+35:33
+Right? Euclidean distance, well, that's square root of 2 times 2, so it's about 2.8.
+35:38
+And that's three. So in terms of just standard distance in the plane, we would say that these two are closer than those two are.
+35:46
+Manhattan distance, why is it called that? Because you can only walk along the avenues and the streets.
+35:52
+Manhattan distance would basically say this is one, two, three, four units away. This is one, two, three units away.
+35:59
+And under Manhattan distance, this is closer, this pairing is closer than that pairing is.
+36:05
+Now you're used to thinking Euclidean. We're going to use that. But this is going to be important when we think about how are we comparing distances
+36:12
+between these different pieces. So typically, we'll use Euclidean. We're going to see Manhattan actually has some value.
+36:19
+So if I go back to my three examples-- boy, that's a gross slide, isn't it? But there we go-- rattlesnake, boa constrictor, and dart frog.
+36:25
+There is the representation. I can ask, what's the distance between them? In the handout for today, we've given you a little piece
+36:31
+of code that would do that. And if I actually run through it, I get, actually, a nice little result. Here
+36:38
+are the distances between those vectors using Euclidean metric. I'm going to come back to them.
+36:44
+But you can see the two snakes, nicely, are reasonably close to each other.
+36:50
+Whereas, the dart frog is a fair distance away from that. Nice, right? That's a nice separation that says there's
+36:56
+a difference between these two. OK. Now I throw in the alligator.
+37:03
+Sounds like a Dungeons & Dragons game. I throw in the alligator, and I want to do the same comparison.
+37:09
+And I don't get nearly as nice a result. Because now it says,
+37:14
+as before, the two snakes are close to each other. But it says that the dart frog and the alligator
+37:21
+are much closer, under this measurement, than either of them is to the other.
+37:27
+And to remind you, right, the alligator and the two snakes I would like to be close to one another and a distance
+37:33
+away from the frog. Because I'm trying to classify reptiles versus not.
+37:38
+So what happened here? Well, this is a place where the feature engineering is going to be important.
+37:44
+Because in fact, the alligator differs from the frog in three features.
+37:51
+And only in two features from, say, the boa constrictor. But one of those features is the number of legs.
+37:57
+And there, while on the binary axes, the difference is between a 0 and 1, here it can be between 0 and 4.
+38:05
+So that is weighing the distance a lot more than we would like. The legs dimension is too large, if you like.
+38:13
+How would I fix this? This is actually, I would argue, a natural place to use Manhattan distance.
+38:20
+Why should I think that the difference in the number of legs or the number of legs difference
+38:26
+is more important than whether it has scales or not? Why should I think that measuring that distance
+38:32
+Euclidean-wise makes sense? They are really completely different measurements. And in fact, I'm not going to do it,
+38:38
+but if I ran Manhattan metric on this, it would get the alligator much closer to the snakes,
+38:43
+exactly because it differs only in two features, not three. The other way I could fix it would
+38:49
+be to say I'm letting too much weight be associated with the difference in the number of legs. So let's just make it a binary feature.
+38:56
+Either it doesn't have legs or it does have legs. Run the same classification.
+39:03
+And now you see the snakes and the alligator are all close to each other.
+39:09
+Whereas the dart frog, not as far away as it was before, but there's a pretty natural separation, especially
+39:15
+using that number between them. What's my point? Choice of features matters.
+39:22
+Throwing too many features in may, in fact, give us some overfitting. And in particular, deciding the weights
+39:29
+that I want on those features has a real impact. And you, as a designer or a programmer, have a lot of influence in how you think about using those.
+39:37
+So feature engineering really matters. How you pick the features, what you use is going to be important.
+39:43
+OK. The last piece of this then is we're going to look at some examples where we give you data, got
+39:51
+features associated with them. We're going to, in some cases have them labeled, in other cases not. And we know how now to think about how do we
+39:57
+measure distances between them. John. JOHN GUTTAG: You probably didn't intend to say weights of features.
+40:03
+You intended to say how they're scaled. ERIC GRIMSON: Sorry. The scales and not the-- thank you, John. No, I did. I take that back. I did not mean to say weights of features.
+40:09
+I meant to say the scale of the dimension is going to be important here. Thank you, for the amplification and correction.
+40:15
+You're absolutely right. JOHN GUTTAG: Weights, we use in a different way, as we'll see next time. ERIC GRIMSON: And we're going to see next time why we're going to use weights in different ways.
+40:21
+So rephrase it. Block that out of your mind. We're going to talk about scales and the scale on the axes as being important here.
+40:27
+And we already said we're going to look at two different kinds of learning, labeled and unlabeled, clustering and classifying.
+40:34
+And I want to just finish up by showing you two examples of that. How we would think about them algorithmically,
+40:41
+and we'll look at them in more detail next time. As we look at it, I want to remind you the things that are going to be important to you.
+40:48
+How do I measure distance between examples? What's the right way to design that? What is the right set of features to use in that vector?
+40:57
+And then, what constraints do I want to put on the model? In the case of unlabelled data, how
+41:03
+do I decide how many clusters I want to have? Because I can give you a really easy way to do clustering.
+41:08
+If I give you 100 examples, I say build 100 clusters. Every example is its own cluster.
+41:14
+Distance is really good. It's really close to itself, but it does a lousy job of labeling things on it. So I have to think about, how do I
+41:20
+decide how many clusters, what's the complexity of that separating service? How do I basically avoid the overfitting problem,
+41:27
+which I don't want to have? So just to remind you, we've already
+41:32
+seen a little version of this, the clustering method. This is a standard way to do it, simply repeating what
+41:39
+we had on an earlier slide. If I want to cluster it into groups, I start by saying how many clusters am I looking for?
+41:45
+Pick an example I take as my early representation. For every other example in the training data,
+41:50
+put it to the closest cluster. Once I've got those, find the median, repeat the process.
+41:57
+And that led to that separation. Now once I've got it, I like to validate it.
+42:03
+And in fact, I should have said this better. Those two clusters came without looking at the two black dots.
+42:09
+Once I put the black dots in, I'd like to validate, how well does this really work? And that example there is really not very encouraging.
+42:17
+It's too close. So that's a natural place to say, OK, what if I did this with three clusters?
+42:25
+That's what I get. I like the that. All right? That has a really nice cluster up here.
+42:33
+The fact that the algorithm didn't know the labeling is irrelevant. There's a nice grouping of five. There's a nice grouping of four.
+42:39
+And there's a nice grouping of three in between. And in fact, if I looked at the average distance
+42:45
+between examples in each of these clusters, it is much tighter than in that example.
+42:52
+And so that leads to, then, the question of should I look for four clusters?
+42:57
+Question, please. AUDIENCE: Is that overlap between the two clusters not an issue? ERIC GRIMSON: Yes. The question is, is the overlap between the two clusters
+43:04
+a problem? No. I just drew it here so I could let you see where those pieces are. But in fact, if you like, the center is there.
+43:13
+Those three points are all closer to that center than they are to that center. So the fact that they overlap is a good question.
+43:18
+It's just the way I happened to draw them. I should really draw these, not as circles, but as some little bit more convoluted surface.
+43:25
+OK? Having done three, I could say should I look for four? Well, those points down there, as I've already said,
+43:31
+are an example where it's going to be hard to separate them out. And I don't want to overfit. Because the only way to separate those out
+43:37
+is going to be to come up with a really convoluted cluster, which I don't like. All right?
+43:43
+Let me finish with showing you one other example from the other direction. Which is, suppose I give you labeled examples.
+43:52
+So again, the goal is I've got features associated with each example. They're going to have multiple dimensions on it.
+43:57
+But I also know the label associated with them. And I want to learn what is the best way to come up with a rule that will let me take new examples
+44:04
+and assign them to the right group. A number of ways to do this. You can simply say I'm looking for the simplest surface that
+44:12
+will separate those examples. In my football case that were in the plane, what's the best line that separates them,
+44:17
+which turns out to be easy. I might look for a more complicated surface. And we're going to see an example in a second
+44:23
+where maybe it's a sequence of line segments that separates them out. Because there's not just one line that does the separation.
+44:30
+As before, I want to be careful. If I make it too complicated, I may get a really good separator, but I overfit to the data.
+44:38
+And you're going to see next time. I'm going to just highlight it here. There's a third way, which will lead to almost the same kind of result
+44:43
+called k nearest neighbors. And the idea here is I've got a set of labeled data.
+44:49
+And what I'm going to do is, for every new example, say find the k, say the five closest labeled examples.
+44:57
+And take a vote. If 3 out of 5 or 4 out of 5 or 5 out of 5 of those labels are the same, I'm going to say it's part of that group.
+45:04
+And if I have less than that, I'm going to leave it as unclassified. And that's a nice way of actually thinking about how to learn them.
+45:10
+And let me just finish by showing you an example. Now I won't use football players on this one. I'll use a different example.
+45:17
+I'm going to give you some voting data. I think this is actually simulated data. But these are a set of voters in the United States
+45:25
+with their preference. They tend to vote Republican. They tend to vote Democrat. And the two categories are their age and how far away
+45:32
+they live from Boston. Whether those are relevant or not, I don't know, but they are just two things I'm going to use to classify them.
+45:39
+And I'd like to say, how would I fit a curve to separate those two classes?
+45:46
+I'm going to keep half the data to test. I'm going to use half the data to train. So if this is my training data, I
+45:52
+can say what's the best line that separates these? I don't know about best, but here are two examples.
+46:00
+This solid line has the property that all the Democrats are on one side.
+46:05
+Everything on the other side is a Republican, but there are some Republicans on this side of the line. I can't find a line that completely separates these,
+46:12
+as I did with the football players. But there is a decent line to separate them.
+46:17
+Here's another candidate. That dash line has the property that on the right side
+46:22
+you've got-- boy, I don't think this is deliberate, John, right-- but on the right side, you've got almost all Republicans.
+46:28
+It seems perfectly appropriate. One Democrat, but there's a pretty good separation there.
+46:34
+And on the left side, you've got a mix of things. But most of the Democrats are on the left side of that line.
+46:39
+All right? The fact that left and right correlates with distance from Boston is completely irrelevant here. But it has a nice punch to it.
+46:46
+JOHN GUTTAG: Relevant, but not accidental. ERIC GRIMSON: But not accidental. Thank you. All right. So now the question is, how would I evaluate these?
+46:53
+How do I decide which one is better? And I'm simply going to show you, very quickly, some examples.
+46:58
+First one is to look at what's called the confusion matrix. What does that mean? It says for this, one of these classifiers for example,
+47:07
+the solid line. Here are the predictions, based on the solid line of whether they would be more likely to be Democrat or Republican.
+47:13
+And here is the actual label. Same thing for the dashed line. And that diagonal is important because those are
+47:21
+the correctly labeled results. Right? It correctly, in the solid line case,
+47:27
+gets all of the correct labelings of the Democrats. It gets half of the Republicans right. But it has some where it's actually Republican,
+47:35
+but it labels it as a Democrat. That, we'd like to be really large.
+47:40
+And in fact, it leads to a natural measure called the accuracy. Which is, just to go back to that,
+47:46
+we say that these are true positives. Meaning, I labeled it as being an instance, and it really is.
+47:52
+These are true negatives. I label it as not being an instance, and it really isn't. And then these are the false positives.
+47:59
+I labeled it as being an instance and it's not, and these are the false negatives. I labeled it as not being an instance, and it is.
+48:05
+And an easy way to measure it is to look at the correct labels over all of the labels.
+48:11
+The true positives and the true negatives, the ones I got right. And in that case, both models come up with a value of 0.7.
+48:19
+So which one is better? Well, I should validate that. And I'm going to do that in a second by looking at other data.
+48:25
+We could also ask, could we find something with less training error? This is only getting 70% right.
+48:31
+Not great. Well, here is a more complicated model. And this is where you start getting
+48:37
+worried about overfitting. Now what I've done, is I've come up with a sequence of lines that separate them.
+48:42
+So everything above this line, I'm going to say is a Republican. Everything below this line, I'm going to say is a Democrat.
+48:48
+So I'm avoiding that one. I'm avoiding that one. I'm still capturing many of the same things.
+48:54
+And in this case, I get 12 true positives, 13 true negatives, and only 5 false positives.
+49:02
+And that's kind of nice. You can see the 5. It's those five red ones down there. It's accuracy is 0.833.
+49:09
+And now, if I apply that to the test data, I get an OK result.
+49:15
+It has an accuracy of about 0.6. I could use this idea to try and generalize to say could I
+49:21
+come up with a better model. And you're going to see that next time. There could be other ways in which I measure this.
+49:28
+And I want to use this as the last example. Another good measure we use is called PPV, Positive Predictive
+49:34
+Value which is how many true positives do I come up with out of all the things I labeled positively.
+49:42
+And in this solid model, in the dashed line, I can get values about 0.57.
+49:48
+The complex model on the training data is better. And then the testing data is even stronger.
+49:53
+And finally, two other examples are called sensitivity and specificity. Sensitivity basically tells you what percentage
+50:01
+did I correctly find. And specificity said what percentage did I correctly reject.
+50:07
+And I show you this because this is where the trade-off comes in. If sensitivity is how many did I correctly
+50:14
+label out of those that I both correctly labeled and incorrectly labeled as being negative,
+50:20
+how many them did I correctly label as being the kind that I want? I can make sensitivity 1.
+50:27
+Label everything is the thing I'm looking for. Great. Everything is correct. But the specificity will be 0.
+50:35
+Because I'll have a bunch of things incorrectly labeled. I could make the specificity 1, reject everything.
+50:43
+Say nothing as an instance. True negatives goes to 1, and I'm in a great place there,
+50:52
+but my sensitivity goes to 0. I've got a trade-off. As I think about the machine learning algorithm I'm using
+50:58
+and my choice of that classifier, I'm going to see a trade off where I can increase specificity at the cost of sensitivity or vice
+51:07
+versa. And you'll see a nice technique called ROC or Receiver Operator Curve that gives you a sense of how you want to deal with that.
+51:14
+And with that, we'll see you next time. We'll take your question off line if you don't mind, because I've run over time. But we'll see you next time where Professor Guttag
+51:20
+will show you examples of this.

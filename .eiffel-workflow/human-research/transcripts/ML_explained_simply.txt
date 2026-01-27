@@ -1,0 +1,282 @@
+0:00
+What is machine learning? At its core,  Machine Learning is about teaching computers  
+0:04
+to learn from experience. Instead of giving  a computer exact step-by-step instructions,  
+0:10
+we let it figure things out by showing it examples  and letting math do the rest. So basically,  
+0:16
+machine learning is when computers learn  patterns from data and use them to make  
+0:20
+predictions or decisions without being  explicitly programmed for every single  
+0:24
+step. Its kind of like how you learned not to  touch a hot stove as a kid once you got burned.
+0:29
+But before I really get into what ML is, let  me give you more of a contextual understanding.
+0:35
+You might have the heard of this  little thing called AI over the  
+0:38
+past few years. I mean, it's  not like its ever mentioned:
+0:44
+Okay yeah…it's everywhere. If buzzwords  had a leaderboard, AI would be number one.
+0:49
+The thing about AI, is that  it's a very broad field.
+0:53
+At its core, AI, or artificial intelligence,  is about building systems that can perform  
+What Is AI / ML
+0:59
+tasks that normally require human intelligence -  things like recognizing speech, making decisions,  
+1:05
+answering questions, or suggesting what you should  watch next when you really should be going to bed.
+1:11
+Okay cool. So, what does this  have to do with machine learning?
+1:15
+Well, it turns out that machine  learning is a subset of AI.  
+1:20
+It's basically the engine that powers AI's digital  brain to actually learn and improve. Basically,  
+1:26
+if AI is about simulating human intelligence,  then machine learning is the way to actually  
+1:31
+make that happen. Instead of explicit  programming, machine learning uses  
+1:36
+algorithms to analyze large amounts of data  in order to learn and improve from experience.
+1:43
+Along with AI and machine learning, there is an  even further subset of machine learning called  
+1:47
+deep learning, that uses layered neural  networks inspired by the human brain,  
+1:52
+which learns even more complex patterns from  data. Feel free to comment below if you want  
+1:57
+a separate video for deep learning,  as it's a beast of a topic on its own.
+Core Components of Machine Learning
+2:03
+Now that we've established what Machine  Learning is, let's talk about the core  
+2:06
+components that make a machine learning  system actually work. To keep it simple,  
+2:11
+we will focus on four key areas: Data,  Algorithms, Models, and Training and Evaluation.
+2:18
+First up, data. Data is like the ingredients  that machine learning feeds on. Without data,  
+2:25
+there's literally nothing for the machines to  learn form. No data would be like having a car  
+2:30
+with no gasoline. But, here's the thing: While  you need a lot of data to train your machine,  
+2:35
+the quality of your data can be more important  than the quantity. You put garbage data in,  
+2:41
+you often get garbage data out. For example, if  you have a dataset that's full of errors, biases,  
+2:47
+or irrelevant features, well, no algorithm can  fix that. The importance of having quality data  
+2:53
+is largely the reason why data analysts and data  scientists exist. So what does quality data look  
+3:00
+like? Quality data has three things: accuracy  (which means the data should represent reality as  
+3:06
+closely as possible), relevance (which means the  features should directly relate to the prediction  
+3:12
+task) and cleanliness (which remove duplicates,  fix typos, and handles missing values).  
+3:20
+Also, more data generally  equals better performance,  
+3:23
+because it covers more scenarios for edge cases  and lets the model learn subtle relationships  
+3:28
+it couldn't spot with a limited sample  size. But, "more data" only helps if it's  
+3:34
+good data. Millions of noisy or irrelevant data  features will actually work against your goals.
+3:41
+Next up, we have algorithms. Algorithms are  the learning process where we actually extract  
+3:47
+meaningful insights from the data. It's a set of  rules and calculations we use to extract patterns,  
+3:53
+structures, or decision strategies from the  data. If data is like the ingredients that  
+3:58
+machine learning needs, then algorithms are  kind of like the "chef" that turns the raw  
+4:03
+data into something useful. There are tons  of different algorithms in machine learning,  
+4:07
+such as linear regression, logistic regression,  principal component analysis, clustering,  
+4:12
+anomaly detection…basically, there's way too  many algorithms to cover in the scope of this one  
+4:17
+video. But the point is, that the algorithms vary  by task. Some algorithms are good for prediction,  
+4:23
+others for pattern discovery, and  others for trial and error learning.  
+4:28
+These algorithms iteratively adjust their internal  parameters, called weights and biases, to improve  
+4:34
+their accuracy. It's kind of like tuning an old  AM/FM radio. At first you hear a bunch of static,  
+4:41
+but you adjust the dials with tiny nudges  until the station comes through. That's  
+4:46
+basically what a learning algorithm does: it keeps  tweaking its internal parameters, step by step,  
+4:51
+to reduce the "noise", or the errors,  until the predictions come through clearly.
+4:57
+The next component is the model. If data is  the ingredients, and the algorithm is the chef,  
+5:03
+then the model is like the dish. It's what you get  after the algorithm is done learning. Basically,  
+5:09
+the model is a mathematical function that takes  input and produces an output, whether that's a  
+5:14
+prediction, classification, recommendation,  or action, all based on what it learned from  
+5:19
+the training data. For example, your model can  prediction whether your emails are spam or not  
+5:25
+spam, which is called classification. Or you can  train your model to estimate the price of a house,  
+5:31
+based on the details of a home, which  is something called regression. The  
+5:36
+complexity of the model can vary, it really  depends on your end goal. So for example,  
+5:42
+these models can range from a simple straight  line regression equation, to complex deep  
+5:48
+networks with billions of parameters.  That complexity depends on your problem,  
+5:53
+data scale, and depth of your pockets. In short the model is basically the  
+5:58
+brain that is the result of your  training data and your algorithm.
+6:04
+Lastly, we have Training and Evaluation.  Training is the model's practice phase.  
+6:09
+This is where the algorithm has access  to data and uses it to learn patterns,  
+6:13
+adjust parameters, and of course, get better  at making predictions or decisions. Machine  
+6:18
+learning models don't start knowing the rules.  They discover them from exposure to more quality  
+6:23
+data. Just like a how a pro boxer needs to  train to improve and sharpen his skills,  
+6:29
+the model needs training as well, otherwise  it will end up just making random guesses.  
+6:35
+Each cycle of training reduces error  and improves the ability of the model.
+6:40
+Evaluation is exactly how it sounds,  which is to assess how our model is doing.  
+6:45
+If our model is like the dish, then the  evaluation is like the taste test. It's where  
+6:51
+we find out if all that training actually  resulted in a capable model. In practice,  
+6:57
+you will typically see training and evaluation  performed by dividing up the data into 3  
+7:01
+categories: the training set, which is used  to initially teach the model using the data,  
+7:07
+the validation set, which is used to tune  hyperparameters such as the learning rate,  
+7:12
+and the test set, which is used to  measure the performance of your model.
+7:17
+The model starts with random or default  parameters. As data flows through the algorithm,  
+7:22
+predictions are made. A math formula called a loss  function, which might look something like this,  
+7:28
+is used to measure how wrong the predictions  are. In case this equation you see on screen  
+7:33
+makes you want to go: *The sound of exuberant  discouragement, don't worry, I'll make it  
+7:39
+sound super simple. This equation is a way of  telling the model just how badly it messed up.  
+7:45
+It's kind of like a parent telling their kid,  "You were this close…try again." Basically,  
+7:51
+a loss function tells the model what it needs  to fix. After that, an optimization method such  
+7:57
+as gradient descent is used to adjust parameters  to reduce that loss. This process repeats itself  
+8:04
+a bunch of times across the training set,  until performance reaches an acceptable  
+8:08
+level. So to sum it all up, training builds  the skill, and evaluation measures the skill.
+Types of Machine Learning
+8:17
+The types of machine learning you'll  hear most often about are Supervised,  
+8:21
+Unsupervised, Reinforcement , and Semi-Supervised  Learning. Supervised Learning is when the machine  
+8:27
+learning model learns from labeled examples,  unsupervised learning is when the model finds  
+8:32
+patterns or structure in data without any  labels, reinforcement learning is when the  
+8:37
+model learns by taking actions and receiving  rewards or penalties from the environment.  
+8:42
+And in Semi-Supervised learning, the model learns  from a combination of labeled and unlabeled data.
+8:48
+In supervised learning for example, if  you have photos of apples and bananas,  
+8:52
+with the correct labels, eventually the  model will be able to look at a brand new  
+8:56
+photo and determine whether it's an apple or a  banana. This is what's known as classification,  
+9:02
+when you predict a discrete output. If you feed  the model thousands of housing details and prices,  
+9:08
+it learns to estimate a price for a  new house. This is known as regression,  
+9:12
+where you predict a continuous output. It's kind  of like studying for a test with all the answers.
+9:19
+Unsupervised Learning is where there are  no correct answers provided, meaning it's  
+9:23
+just raw data with no labels. So what does the  model do? Well, the model's job here is to spot  
+9:29
+structure. Here the focus is to group things that  are similar, find patterns, and detect anomalies.  
+9:35
+It initially has no idea that these are circles,  squares and triangles, but it learns to group  
+9:40
+them together based on similar patterns, such  as the color of the circles being blue, or the  
+9:45
+squares having four sides. Unsupervised learning  is kind of like walking into a room full of people  
+9:50
+and figuring out which ones are introverts vs  extroverts based on their behavior patterns.
+9:56
+Reinforcement Learning is a bit different.  It's all about trial and error. Here,  
+10:01
+there's something called an agent that  interacts with an environment, takes actions,  
+10:05
+gets rewards or penalties, and then tunes it  strategy (which is something called a policy),  
+10:10
+in order to maximize long-term reward.  It’s a lot like learning how to play a  
+10:14
+difficult video game. You die repeatedly,  but you get slightly further each time,  
+10:19
+until you master the level. Here's a real world  example of reinforcement learning in action. As  
+10:26
+you can see, the robot failed at first, but  eventually was successful at walking over the  
+10:30
+obstacle…much like humans attempting things  for the first time before getting good at it.
+10:35
+And lastly, we have semi-supervised learning.  Semi-supervised learning is like the fusion  
+10:40
+between supervised and unsupervised learning.  It's exactly what it sounds like. You have some  
+10:45
+labeled data, but not enough to train a great  supervised model, so you let the algorithm  
+10:50
+use the unlabeled data to learn additional  structure and improve performance. For instance,  
+10:55
+if you have a few photos of dogs and  cats, each with labels, the model will  
+11:00
+look at these labels and features and use what it  learned to try and identify the unlabeled ones.
+11:07
+Think of these as different ways to get good at  something…kind of like the way we humans learn,  
+11:11
+either by having a teacher,  figuring stuff on their own,  
+11:14
+or just messing around until  we finally get it right.
+Conclusion
+11:18
+And now, you're smarter in machine learning than  you were 10 minutes ago. Congratulations! Machine  
+11:24
+learning is a fascinating and constantly  evolving world. But at the core of it,  
+11:28
+it isn't some mysterious black box  or magic. It's really just data,  
+11:32
+algorithms, and some trial  and error doing their thing.
+11:36
+If you want to learn more about Machine Learning,  I've got a free ebook that breaks Machine Learning  
+11:40
+down in a super simple and easy way. It goes  over all the concepts that I've covered here,  
+11:45
+but it also does a deeper dive into the different  algorithms used, as well as cover some more of  
+11:50
+the fundamentals of Machine Learning. It's  called Machine Learning Simplified. No scary  
+11:54
+math or complex jargon. You can click the  link in the description or scan the QR code  
+12:00
+on screen to get your copy. Go ahead and read it  at your own pace, and again, it's totally free.
+12:06
+If you liked this video, please like and  subscribe and leave a comment down below  
+12:10
+of what topic you'd like to see covered  next. I'll see you guys in the next video.

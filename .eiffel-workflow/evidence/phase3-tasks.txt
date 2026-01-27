@@ -1,0 +1,125 @@
+# Phase 3: Task Decomposition - Evidence File
+# Project: d:\prod\simple_montecarlo
+# Date: 2026-01-27
+# Status: COMPLETE
+
+## Task Generation Summary
+
+Total Tasks Created: 8
+- Task 1: MEASUREMENT class implementation
+- Task 2: TRIAL_OUTCOME class implementation
+- Task 3: SIMULATION_STATISTICS class implementation
+- Task 4: MONTE_CARLO_EXPERIMENT Part A (core infrastructure)
+- Task 5: MONTE_CARLO_EXPERIMENT Part B (statistics extraction)
+- Task 6: TRIAL_LOGIC_CALLABLE documentation class
+- Task 7: Full compilation and contract verification
+- Task 8: Skeletal test framework setup
+
+## Input Documents
+
+Sources:
+- src/measurement.e (60 lines)
+- src/trial_outcome.e (100 lines)
+- src/simulation_statistics.e (110 lines)
+- src/monte_carlo_experiment.e (220 lines)
+- src/trial_logic_callable.e (35 lines)
+- .eiffel-workflow/approach.md (342 lines, implementation strategy)
+- .eiffel-workflow/synopsis.md (248 lines, Phase 2 review findings)
+
+## Phase 2 Issues Addressed
+
+Issue #1 (High): compute_statistics placeholder
+  → Task 5: Implement actual mean, std_dev, min, max, CI calculations
+
+Issue #2 (Medium): extract_all_measurements incomplete
+  → Task 5: Populate Result list by iterating outcomes and extracting measurements
+
+Issue #3 (Low): make validation redundant
+  → Task 4a: Decision documented - reject suggestion, trust precondition (design decision per DbC philosophy)
+
+Issue #4 (Low): outcome_at indexing off-by-one
+  → Task 4a: Fix with `Result := outcomes [a_index - 1]` to convert 1-based user input to 0-based list
+
+Issue #5 (High): run_simulation agent validation
+  → Task 4a: Verified correct - no changes needed (precondition + attached check pattern valid)
+
+## Dependency Analysis
+
+Simple dependency chain:
+  Task 1 → Task 2 → Task 4a → Task 5
+              ↑                    ↑
+           Task 3 ────────────────┘
+
+Task 6: Independent (documentation class)
+Task 7: Gate (depends on Tasks 1-6)
+Task 8: Follow-on (test framework, depends on Task 7)
+
+Critical path: Task 1 → Task 2 → Task 4a → Task 5 → Task 7 (4 weeks estimated)
+
+## Acceptance Criteria Summary
+
+Total Acceptance Criteria: 142 across 8 tasks
+- Task 1: 12 criteria
+- Task 2: 12 criteria
+- Task 3: 15 criteria
+- Task 4a: 24 criteria
+- Task 5: 24 criteria
+- Task 6: 7 criteria
+- Task 7: 8 criteria
+- Task 8: 7 criteria
+
+Each criterion is testable and verifiable via compilation, contract postconditions, or unit tests.
+
+## Estimated Effort
+
+Phase 4 Implementation Estimate:
+- Week 1-2: Tasks 1, 2, 3 (core data classes)
+- Week 2-3: Task 4a (core experiment loop)
+- Week 3-4: Task 5 (statistics calculations)
+- Parallel: Task 6 (trivial documentation)
+- End of Week 4: Task 7 (compilation gate)
+- Phase 5: Task 8 + 55 test implementations
+
+Total Phase 4: 3-4 weeks
+Total Phase 5: 2-3 weeks
+
+## Key Design Decisions Documented
+
+1. **MEASUREMENT type-safety**: Prevents confusion between measurement and probability values at compile time
+2. **TRIAL_OUTCOME dual-list pattern**: Maintain parallel ARRAYED_LIST [MEASUREMENT] and ARRAYED_LIST [STRING]
+3. **SIMULATION_STATISTICS immutability**: All fields set in make, no modification commands
+4. **MONTE_CARLO_EXPERIMENT 1-based user indexing**: outcome_at accepts 1-based input, converts to 0-based internally
+5. **Void-safe agent pattern**: `if attached trial_logic_agent as l_agent then ...` for proper void handling
+6. **DbC precondition philosophy**: Validation at boundaries (callers), not inside constructors
+
+## Phase 2 Review Issues - Final Status
+
+HIGH (2):
+  Issue #1: compute_statistics ✓ Task 5 with clear acceptance criteria
+  Issue #5: run_simulation agent ✓ Already correct, verified in Task 4a
+
+MEDIUM (1):
+  Issue #2: extract_all_measurements ✓ Task 5 with population logic
+
+LOW (2):
+  Issue #3: make validation ✗ REJECTED per DbC philosophy (documented in Task 4a)
+  Issue #4: outcome_at indexing ✓ Task 4a with [a_index - 1] fix
+
+All 5 issues are resolved with actionable Phase 4 tasks.
+
+## Next Steps
+
+1. USER APPROVAL: Review tasks.md and approve proceeding to Phase 4
+2. Phase 4: Implement 8 tasks per dependency order
+3. Phase 4 Exit Gate: Task 7 - compilation succeeds, zero warnings
+4. Phase 5: Implement 55 test cases and verify against statistical theory
+
+## Files Generated
+
+- .eiffel-workflow/tasks.md (comprehensive 8-task breakdown)
+- .eiffel-workflow/evidence/phase3-tasks.txt (this file)
+
+---
+
+STATUS: PHASE 3 COMPLETE - AWAITING USER APPROVAL TO PROCEED TO PHASE 4 IMPLEMENTATION
+

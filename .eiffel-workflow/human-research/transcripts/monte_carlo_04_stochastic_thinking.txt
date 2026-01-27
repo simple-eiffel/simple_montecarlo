@@ -1,0 +1,833 @@
+0:00
+The following content is provided under a Creative Commons license. Your support will help MIT OpenCourseWare
+0:06
+continue to offer high quality educational resources for free. To make a donation or to view additional materials
+0:13
+from hundreds of MIT courses, visit MIT OpenCourseWare at ocw.mit.edu.
+0:18
+0:28
+JOHN GUTTAG: So today, we're going to move on to a fairly different world than the world
+0:34
+we've been living in. And this will be a world we'll be living in for quite a few lectures.
+0:40
+But before I do that, I want to get back to just finish up something that Professor Grimson started.
+0:47
+You may recall he talked about family trees and raised the question, was it actually
+0:52
+possible to represent all ancestral relationships as a tree? Well, as a counterexample, I'm sure some of you
+0:59
+are familiar with Oedipus Rex. For those of you who are not, I'm
+1:05
+happy give you a plot summary at the end of the lecture. It's a rather bizarre plot.
+1:10
+But it was captured in a wonderful song by Tom Lehrer.
+1:16
+The short story is Oedipus ended up marrying his mother and having four children.
+1:22
+And Tom Lehrer, if you've never heard of Tom Lehrer, you're missing one of the world's funniest songwriters.
+1:29
+And he had a wonderful song called "Oedipus Rex," and I recommend this YouTube as a way to go and listen to it.
+1:38
+And you can gather from the quote what the story is about.
+1:44
+I also recommend the play, by the way. It's really kind of appalling what goes on,
+1:50
+but it's beautiful. Back to the main topic, here's the relevant reading--
+1:57
+a small bit from later in the book and then chapter 14.
+2:05
+You may notice that we're not actually going through the book in order. And the reason we're not doing that is because we're
+2:11
+trying to get you information you need in time to do problem sets.
+2:18
+So the topic of today is really uncertainty and the fact
+2:24
+that the world is really annoyingly hard to understand.
+2:29
+This is a signpost related to 6.0002,
+2:36
+but we won't go into too much detail about it. We'd rather things were certain.
+2:43
+But in fact, they usually are not. And this is a place where 6.0002 diverges
+2:51
+from the typical introductory computer science course, which focuses on things that are functional--
+2:58
+given an input, you always get the same output. It's predictable.
+3:03
+And we like to do that, because that's easier to teach. But in fact, for reasons we'll be talking about,
+3:11
+it's not nearly as useful if you're trying to actually write computations that
+3:16
+help you understand the world. You have to face uncertainty head on.
+3:25
+An analogy is for many years people, believed in Newtonian mechanics--
+3:31
+I guess they still do in 8.01 maybe-- that every effect has a cause.
+3:38
+An apple falls from the tree because of gravity, and you know where it's going to land. And the world can be understood causally.
+3:45
+And people believed this really for quite a long time,
+3:50
+most of history, until the early part of the 20th century, when the so-called Copenhagen
+3:58
+doctrine was put forth.
+4:03
+The doctrine there from Bohr and Heisenberg, two very famous physicists, was one
+4:09
+of what they called causal nondeterminism. And their assertion was that the world at its very most
+4:17
+fundamental level behaves in a way that you cannot predict.
+4:24
+It's OK to make a statement that x is highly likely to occur, almost certain to occur, but for no case can
+4:33
+you make a statement x will occur. Nothing has a probability of one.
+4:40
+This was hard for us to imagine today, when we all know quantum mechanics.
+4:45
+But at the turn of the century, this was a shocking statement. And two other very well-known physicists,
+4:53
+Albert Einstein and Schrodinger, basically said, no, this is wrong. Bohr, Heisenberg, you guys are idiots.
+5:00
+It's just not true. They probably didn't call them idiots. And this is most exemplified by Einstein's famous quote
+5:06
+that "God does not play dice," which is indicative of the fact that this was actually a discussion that permeated
+5:13
+not just the world of physics, but society in general people
+5:19
+really turned it into literally a religious issue, as did Einstein.
+5:24
+Well, so now we should ask the question, does it really matter? And to illustrate that, I need two coins.
+5:31
+I forgot to bring any coins with me. Does anyone got a coin they can lend me? AUDIENCE: I have some coins.
+5:37
+JOHN GUTTAG: All right. Now, this is where I see how much the students trust me. Do I get a penny?
+5:44
+Do I get a silver dollar? So what do we got here?
+5:50
+This is someone who's entrusting me with quarters, not so bad.
+5:57
+So we'll take these quarters, and we'll shake them up, and we'll put them down on the table.
+6:04
+And now, we'll ask a question-- do we have two heads, two tails, or one head and one tail?
+6:13
+So who thinks we have two heads? Who thinks we have two tails?
+6:20
+Who thinks we have one of each? Well, clearly, everyone except a few people-- for example,
+6:26
+the Indians fan, who clearly believe in the counterfactual--
+6:33
+made the most probabilistic decision. But in fact, there is no nondeterminism here.
+6:40
+I know the answer. And so in some sense, it doesn't matter
+6:47
+whether it's deterministic, because in fact, it's not causally nondeterministic. The answer is quite clear, but you don't know the answer.
+6:58
+And so whether or not the world is inherently unpredictable,
+7:03
+the fact that we never have complete knowledge of the world suggests that we might as well treat
+7:10
+it as inherently unpredictable. And so this is called predictive nondeterminism.
+7:19
+And this really is what's going to underline pretty much everything else we're going to be doing here.
+7:30
+No comments about that? I wouldn't do that to you.
+7:37
+Thank you. I know you are wishing to get interest on the money,
+7:42
+but you don't get any. AUDIENCE: Was it heads or tails?
+7:51
+JOHN GUTTAG: What was that? So when we think about nondeterminism in computation,
+8:00
+we use the word stochastic process. And that's any process that's ongoing
+8:07
+in which the next state depends upon the previous states
+8:12
+in some random element. So typically up till now when we've written code,
+8:18
+one line of code did depended only on what the previous lines of code did. There was no randomness.
+8:25
+Here, we're going to have randomness. And we can see the difference if we look at these two specifications of rolling a die.
+8:34
+The first one, returns an int between 1 and 6, is what I'll call underdetermined.
+8:41
+By that I mean you can't tell what it's going to return. Maybe it will return a different number each time you call it,
+8:49
+but it's not required to. Maybe it will return three every time you call it.
+8:55
+The second specification requires randomness. It says, it returns are randomly chosen int.
+9:01
+So it requires a stochastic implementation.
+9:06
+Let's look at how we implement a random process in Python. We start by importing the library random.
+9:15
+This is not to say you can import any random library you want. It's to say you import the library called random.
+9:22
+Let me get my pen out of here. And we'll use that a lot.
+9:29
+And then we're going to use the function in random called random.choice.
+9:34
+It takes as an argument a sequence, in this case a list, and randomly chooses one member of the list.
+9:43
+And it chooses it uniformly.
+9:49
+It's a uniform distribution. And what that means is that it's equally probable
+9:56
+that it will choose any number in that list each time you call it. We'll later look at distributions
+10:03
+that are not uniform, not equally probable, where things are weighted. But here, it's quite simple, it's just uniform.
+10:10
+And then we can test it using testRoll--
+10:16
+take some number of n and rolls the die that many times and creates a string telling us what we got.
+10:24
+So let's consider running this on, say, testRoll of five.
+10:36
+And we'll ask the question, if we run it, how probable is it that it's going to return a string
+10:43
+of five 1's?
+10:50
+How do we do that? Now, how many people here are either in 6.041 or would have taken 6.041?
+10:56
+Raise your hand. Oh, good. So very few of you know probability.
+11:02
+That helps. So how do we think about that question?
+11:09
+Well, probability, to me at least, is all about counting,
+11:14
+especially discrete probability, which is what we're looking at here.
+11:19
+What you do is you start by counting the number of events that have the property of interest
+11:29
+and the number of possible events and divide one by the other.
+11:35
+So if we think about rolling a die five times,
+11:41
+we can enumerate all of the possible outcomes of five rolls.
+11:47
+So if we look at that, what are the outcomes? Well, I could get five 1's.
+11:54
+I could get four 1's and a 2 or four 1's and 3, skip a few.
+12:00
+The next one would be three 1's, a 2 and a 1, then a 2 and 2, and finally, at the end, all 6's.
+12:08
+So remember, we looked before at when we're looking at optimization problems about binary numbers.
+12:17
+And we said we can look at all the possible choices of items in the knapsack by a vector of 0's and 1's.
+12:24
+We said, how many possible choices are there? Well, it depended on how many binary numbers you could
+12:30
+get in that number of digits. Well, here we're doing the same thing, but instead of base 2,
+12:36
+it's base 6. And so the number of possible outcomes of five rolls
+12:45
+is quite high. How many of those are five 1's?
+12:50
+Only one of them, right? So in order to get the probability of a five 1's, I
+12:58
+divide 1 by 6 to the fifth. Does that makes sense to everybody?
+13:06
+So in fact, we see it's highly unlikely. The probability of a five 1's is quite small.
+13:15
+Now, suppose we were to ask about the probability of something else-- instead of five 1's, say 53421.
+13:27
+It kind of looks more likely than that than five 1's in a row, but of course, it isn't, right?
+13:33
+Any specific combination is equally probable. And there are a lot of them.
+13:40
+So this is all the probability we're going to think about we could think about this way, as simply a matter of counting--
+13:48
+the number of possible events, the number of events that have the property of interest-- in this case being all 1's--
+13:54
+and then simple division. Given that framework, there were three basic facts
+14:03
+about probability we're going to be using a lot of. So one, probabilities always range from 0 to 1.
+14:15
+How do we know that? Well, we've got a fraction, right? And the denominator is all possible events.
+14:25
+The numerator is the subset of that that's of interest. So it has to range from 0 to the denominator.
+14:35
+And that tells us that the fraction has to range from 0 to 1. So 1 says it's always going to happen, 0 never.
+14:43
+So if the probability of an event occurring is p,
+14:50
+what's the probability of it not occurring? This follows from the first bullet.
+14:57
+It's simply going to be 1 minus p.
+15:04
+This is a trick that we'll find we'll use a lot. Because it's often the case when you
+15:09
+want to compute the probability of something happening, it's easier to compute the probability of it not happening
+15:16
+and subtract it from 1. And we'll see an example of that later today.
+15:24
+Now, here's the biggie. When events are independent of each other,
+15:31
+the probability of all of the events occurring is equal to the product of the probabilities of each
+15:39
+of the events occurring. So if the probability of A is 0.5 and the probability of B
+15:53
+is 0.4, the probability of A and B is what?
+16:01
+0.5 times 0.4.
+16:07
+You guys can figure that out. I think that's 0.2.
+16:14
+So you'd expect that, that it should be much smaller than either of the first two probabilities.
+16:20
+This is the most common rule, it's something we use all the time in probabilities, the so-called multiplicative law.
+16:28
+We have to be careful about it, however, in that it only holds if the events are actually
+16:37
+independent. Two events are independent if the outcome of one
+16:44
+has no influence on the outcome of the other.
+16:50
+So when we roll the die, we assume that the first roll, the outcome, was independent of the--
+16:55
+or the second roll was independent of the first roll, independent of the fourth roll.
+17:00
+When we looked at the two coins, we assume that heads and tails of each coin was independent of the other coin.
+17:08
+I didn't, for example, look at one coin and make sure that the other one was different.
+17:15
+The danger here is that people often compute probabilities assuming independence when you don't
+17:22
+actually have independence. So let's look at an example.
+17:29
+For those of you familiar with American football, the New England Patriots and the Denver Broncos
+17:35
+are two prominent teams. And let's look at computing the probability of whether one of them will lose on a given Sunday.
+17:45
+So the Patriots have a winning percentage of 7 of 8-- they've won 7 of their 8 games so far--
+17:51
+and the Broncos 6 of 8. The probability of both winning next Sunday,
+17:57
+assuming that this is indicative of how good they are, we can get with the multiplicative rule.
+18:03
+So it's 7/8 times 6/8, or 42/64.
+18:08
+We could simplify that fraction, I suppose. Does that makes sense?
+18:14
+So this is probably a pretty good estimate of both of them winning next Sunday.
+18:20
+So the probability of at least one of them losing is 1 minus that.
+18:27
+So here's an example of why we often use the 1 minus rule, because we could
+18:34
+compute the probability of both of them winning by simply multiplying.
+18:41
+And we subtract that from 1. However, what about Sunday, December 18?
+18:47
+What's the probability? Well, as it happens, that day the Patriots
+18:53
+are playing the Broncos. So now suddenly, the outcomes are not independent.
+19:02
+The probability of one of them losing is influenced by the probability of the other winning.
+19:10
+So you would expect the probability of one of them losing is much closer to 1 than 22/64,
+19:17
+which is about 1/3. So in this case, it's easy.
+19:25
+But as we'll see, as we get through the term, there are lots of cases where you
+19:30
+have to work pretty hard to understand whether or not two events really are independent.
+19:36
+And if you get it wrong, you get a totally bogus answer. 1/3 versus 1 is a pretty big difference.
+19:45
+By the way, as it happens, the probability of the Broncos losing is about 1.
+19:56
+Let's go look at some code. And we'll go back to our dice, because it's
+20:03
+much easier to simulate dice games than it is to simulate football games.
+20:08
+So here it is.
+20:13
+And we're going to talk a lot about simulations. So here, rather than rolling the die,
+20:18
+I've written a program to do it. We've already seen the code for rolling a die.
+20:27
+And so to run this simulation, typically what we're doing here
+20:32
+is I'm giving you the goal-- for example, are we going to get five 1's--
+20:38
+the number of trials-- each trial, in this case, will be say of length 5--
+20:47
+so I'm going to roll the same die five times say 1,000 different times, and then just some text
+20:55
+as to what I'm going to print. Almost all the simulations we look at
+21:01
+are going to start with lines that look a lot like that. We're going to initialize some variable.
+21:08
+And then we're going to run some number of trials.
+21:16
+So in this case, we're going to get from the length of the goal--
+21:21
+so if the goal is five 1's, then we're going to roll the dice five times; if it's 10 runs,
+21:26
+we'll roll it 10 times. So this is essentially one trial, one attempt.
+21:35
+And then we'll check the result. And if it
+21:41
+has the property we want-- in this case, it's equal to the goal--
+21:47
+then we're going to increment the total, which we initialized up here by 1.
+21:54
+So we'll keep track with just the counting-- the number of trials that actually meet the goal.
+22:01
+And then when we're done, what we're going to do is divide the number that met the goal
+22:08
+by the number of trials-- exactly the counting argument we just looked at.
+22:14
+And then we'll print the result.
+22:19
+Almost every simulation we look at is going to have this structure. There'll be an outer loop, which is the number of trials.
+22:27
+And then inside-- maybe it'll have a loop, or maybe it won't-- will be a single trial. We'll sum up the results.
+22:33
+And then we'll divide by the number of trials. Let's run it.
+22:45
+So a couple of things are going to go on here. If you look at the code as we've looked at it before,
+22:59
+what you're seeing is I'm computing the estimated probability by the simulation.
+23:05
+And I'm comparing it to the actual probability, which we've already seen how to compute.
+23:12
+So if you look at it, there are a couple of things to look at.
+23:17
+The estimated probability is pretty close to the actual probability but not the same.
+23:24
+So let's go back to the PowerPoint.
+23:31
+Here are the results. And there are at least two questions raised
+23:37
+by this result. First of all, how did I know that this is what would get printed?
+23:43
+Remember, this is random. How did I know that the estimate-- well, there's
+23:48
+nothing random about the actual probability. But how did I know that the estimated probability
+23:55
+would be 0? And why did it print it twice? Because I messed up the PowerPoint. Any rate, so how do I know what would get printed?
+24:04
+Well a confession-- random.choice
+24:12
+is not actually random. In fact, nothing we can do in a computer is actually random.
+24:20
+You can prove that it's impossible to build a computer that actually generates truly random numbers.
+24:28
+What they do instead is generate numbers that called pseudorandom.
+24:34
+24:42
+How do they do that? They have an algorithm that given one number generates
+24:48
+the next number in a sequence. And they start that algorithm with a seed.
+24:56
+Now, typically, they get that seed
+25:02
+by reading the clock of the computer. So most computers have a clock that, say,
+25:08
+keeps track of the number of microseconds since January 1, 1978.
+25:14
+I don't know if that's still true. That's what Unix used to do. So the notion is, you start your program,
+25:22
+there's no way of knowing how many microseconds have elapsed. And so you're getting a random number to start the process.
+25:29
+Since you don't know where it starts, you don't know what the second number
+25:34
+is, you don't know what the third number is, you don't know what the fourth number is. And so it's predictably nondeterministic,
+25:42
+because you don't know what the seed is going to be. Now, you can imagine that this makes
+25:49
+programs really hard to debug. Every time you run it, something different could happen.
+25:55
+Now, we'll see often you want them to be unpredictable. But for now, we want them to be predictable, makes it easier
+26:02
+prepare PowerPoint. So what you have is a command.
+26:08
+You can call random.seed and give it a value
+26:19
+and say, I don't want you to just choose some random seed, I want you to use 0 as the seed.
+26:24
+For the same seed, you always get the same sequence of random values.
+26:30
+And so what I've done is I set the seed to be, I think, 0 in this case, not because there's anything magic about 0,
+26:36
+it's just sort of habit. But it made it predictable. As you write programs with randomness
+26:43
+in and when you're debugging it, you will almost surely want to start by setting random.seed to a value
+26:49
+so you get the same answer. But make sure you debug it with more than one value of this,
+26:54
+so you didn't just get lucky with your seed. So that's how I knew what would get printed.
+27:01
+The next question is, why did the simulation
+27:06
+give me the wrong answer? The actual probability is three 0's and 1286.
+27:14
+But it's estimated a probability of 0. Why is it wrong?
+27:20
+Well, let's think about this.
+27:27
+I ran 1,000 trials. What does it mean to say the probability is zero?
+27:32
+It means that I tried it 1,000 times and didn't ever get a sequence of five 1's.
+27:39
+So the numerator of the division at the bottom was 0.
+27:44
+Hence, the answer is 0. Is this surprising? Well, no. Because if that's the actual probability of getting five
+27:54
+1's, it's not very shocking that in 1,000 trials it never happened.
+28:02
+It's not a surprising result. And so we have to be careful when we run these things to understand
+28:09
+the difference between what's in this case an actual probability
+28:14
+and what statisticians call a sample probability.
+28:25
+So what we got with the sample was 0. So what's the obvious thing to do?
+28:32
+If you're doing a simulation of an event and the event is pretty rare, you
+28:39
+want to try it on a very large number of trials. So let's go back to our code.
+28:45
+28:51
+And we'll change it to instead of 1,000, 1,000,000.
+28:58
+You can see up here, by the way, where I set the seed. And now, let's run it.
+29:17
+We did a lot better. If we look at here our estimated probability, it's three 0's 128, still not quite
+29:25
+the actual probability but darn close. And maybe if I had done 10 million,
+29:31
+it would have been even closer. So if you're writing a simulation
+29:38
+to compute the probability of an event and the event is moderately rare,
+29:44
+then you better run a lot of trials before you believe your estimated probability.
+29:51
+In a week or so, we'll actually look at that more mathematically and say, what is a lot,
+29:57
+how do we know what is enough.
+30:12
+What are the morals here? Moral one, I've just told you-- takes a lot of trials to get a good estimate of the frequency
+30:18
+of a rare event. Moral two, we should always, if we're getting an estimated
+30:26
+probability, know that, and probably say that, and not confuse it with the actual probability.
+30:33
+The third moral here is, it was kind of stupid to do a simulation.
+30:38
+Since it was a very simple closed-form answer that we could compute that would really tell us
+30:45
+what the actual probability is, why even bother with the simulation?
+30:51
+Well, we're going to see why now, because simulations can be very useful.
+30:57
+Let's look at another problem. This is the famous birthday problem. Some of you have seen it.
+31:03
+What's the probability of at least two people in a group having the same birthday?
+31:08
+There's a URL at the bottom. That's pointing to a Google form. I'd like please all of you who have a computing device
+31:15
+to go to it and fill out your birthday. It's anonymous, so we won't know how old you are, don't worry.
+31:22
+Actually, it's only the date. It's not the year. So suppose there were 367 people in the group, roughly
+31:33
+the number of people who took the 6.0001 600 midterm.
+31:40
+If they are 367 people, what's the probability of at least two of them sharing a birthday?
+31:49
+One, by something called the pigeonhole principle. You got some number of holes.
+31:56
+And if you have more pigeons than holes, two pigeons have to share a whole.
+32:01
+What about smaller numbers? Well, if we make a simplifying assumption
+32:07
+that each birthdate is equally likely, then there's actually a nice closed-form solution for it.
+32:13
+Again, this is a question where it's easier
+32:20
+to compute the opposite of what you're trying to do and subtract it from 1.
+32:26
+And so this fraction is giving the probability of two people
+32:32
+not sharing a birthday. The proof that this is right, it's a little bit elaborate.
+32:38
+But you can trust me, it's accurate. But it's a formula, and it's not that complicated a formula.
+32:46
+So numbers like 366 factorial are big.
+32:55
+So let's approximate a solution. We'll right a simulation and see if we get the same answer
+33:00
+that that formula gave us. So here's the code for that--
+33:07
+two arguments-- the number of people in the group and the number that we asking do
+33:14
+they have the same birthday. So since I'm assuming for now that every birthday is equally
+33:21
+likely, the possible dates range from 1 to 366, because some years have a February 29.
+33:28
+I'll keep track of the number of people born in each date
+33:35
+by starting with none. And then for p in the range of number of people,
+33:41
+I'll make a random choice of the possible dates and increment that element of the list by 1.
+33:49
+And then at the end, we can say, look at the maximum number of birthdays and see if it's greater than or equal to the number of same.
+33:59
+So that tells us that. And then we can actually look at the birthday problem--
+34:07
+number of people, the number of same, and, as usual, the number of trials.
+34:13
+So the number of hits is 0 for t in range number of trials. If sameDate is true, then we'll increment the number
+34:21
+of hits by 1 and then as usual divide by the number of trials.
+34:28
+And we'll try it for 10, 20, 40, and 100 people.
+34:34
+And then just, we'll print the estimated probability
+34:41
+and the actual probability computed using that formula I showed you.
+34:48
+I have not shown you, but I've imported a library called math, because it
+34:53
+is a factorial implementation. It's way faster than the recursive one that we've seen before.
+35:00
+Let's run it.
+35:23
+And we'll see what we get. So for 10, the estimated probability is 0.11 now.
+35:30
+So you can see, the estimates are really pretty good.
+35:36
+Once again, we have this business that for 100, we're estimating 1, when the real answer is point many,
+35:43
+many 9's. But again, this is sample probability. It just means in the number of trials we did, every 1
+35:53
+for 100 people, there was a shared birthday. This is a number that usually surprises people,
+35:59
+as to why with 100 people the probability is so high. But we could work out the formula and see it.
+36:06
+And as you can see, the estimates are pretty good from my simulation.
+36:20
+Now, we're going to see why we did a simulation in the first place. Suppose we want the probability of three people sharing
+36:27
+a birthday instead of two.
+36:34
+It's pretty easy to see how we changed the simulation. I even made a parameter. I just changed the number 2 to number 3.
+36:42
+The math, on the other hand, is ugly.
+36:48
+Why is the math so much uglier for 3 than for 2? Because for 2, the complementary problem--
+36:55
+the number we're subtracting from 1-- is simply the question of, are all birthdays different?
+37:03
+So did two people share a birthday is 1 minus or all does everybody have a different birthday.
+37:11
+On the other hand, for 3 people, the complementary problem is a complicated disjunct-- a bunch of ors--
+37:19
+either all birthdays are distinct, or two people share a birthday and the rest are distinct,
+37:26
+or there are two groups of two people sharing a birthday and everything is distinct.
+37:31
+So you can see here, there's a lot of possibilities. And so it's 1 minus now a very complicated formula.
+37:40
+And in fact, if you try and look how to do this, most people will tell you don't bother. Here's kind of a good approximation.
+37:48
+But the math gets very hairy. In contrast, changing the simulation is dead easy.
+37:57
+We can do that.
+38:03
+Whoops. So if we come over here for the code, all I have to do
+38:13
+is change this to 2 or 3.
+38:25
+And I'm going to leave in this code, which is the wrong code, computing the actual probability now
+38:31
+for 2 people sharing rather than 3, because I want to make it easy for you to see the difference between what
+38:37
+happens when we look at 3 shared rather than 2 shared.
+38:53
+And I get invalid syntax. That's not good.
+38:58
+That's what happens when I type in real time.
+39:07
+Why do I have invalid syntax? AUDIENCE: Line 56. JOHN GUTTAG: Pardon. AUDIENCE: Line 56.
+39:13
+JOHN GUTTAG: One person, Anna. AUDIENCE: Line 56, there's a comma. JOHN GUTTAG: Oh.
+39:20
+That's not a good line.
+39:32
+So now, we see that if we get, say, to n equals 100, for 2,
+39:40
+you'll remember, it was 0.99. But for 3, it's only 0.63.
+39:46
+So we see going from two sharing to three sharing gets us a radically different answer, not surprisingly.
+39:54
+But we also-- and the real thing I wanted you to see-- is how easy it was to answer this question with the simulation.
+40:01
+And that's a primary reason we use simulations to get probabilistic questions rather
+40:09
+than sitting down and the pencil and paper and doing fancy probability calculations,
+40:14
+because it's often way easier to do a simulation. We can see that in spades if we look at the next question.
+40:22
+Let's think about this assumption
+40:28
+that all birthdays are equally likely. Well, as you can see, this is a chart
+40:33
+of how common birthdates are in the US, a heat map.
+40:38
+And you'll see, for example, that February 29
+40:44
+is quite an uncommon birthday. So we should probably treat that differently.
+40:52
+Somewhat surprisingly, you'll see that July 4 is a very uncommon birthday as well.
+40:57
+It's easy to understand why February 29. The only thing I can figure out for July 4
+41:02
+is obstetricians don't like working on holidays. And so they induce labor sometime
+41:08
+around the 2nd or the 3rd, so they don't have to come to work on the 4th or the 5th.
+41:14
+Sounds a horrible thought. But I can't think of any other explanation for this anomaly.
+41:19
+You'll probably, if you look at it, see Christmas day is not so common either.
+41:25
+So now, the question, which we can answer, since you've all fill out this form, is how exceptional are MIT students?
+41:32
+We like to think that you're different in every respect. So are your birthdays distributed differently
+41:38
+than other dates? Have we got that data? So now we'll go look at that.
+41:44
+We should have a heat map for you guys.
+41:50
+This one? AUDIENCE: Yep.
+41:56
+I removed all the February 31. Thank you for those submissions.
+42:02
+[LAUGHTER] JOHN GUTTAG: So here it is.
+42:08
+And we can see that, well, they don't seem to be banded quite as much in the summer months,
+42:17
+probably says more about your parents than it does about you.
+42:23
+But you can see that, indeed, we do have-- wow, we have a day where there are
+42:28
+five birthdays, that look like? Or no? AUDIENCE: February 12. JOHN GUTTAG: Wow.
+42:33
+You want to raise your hand if you're born on February 12?
+42:39
+[LAUGHTER]
+42:45
+So you are exceptional in that you lie about when you're born.
+42:51
+But if you hadn't lied, I think we would have still seen
+42:57
+the probabilities would hold. How many people were there, do we know?
+43:03
+AUDIENCE: 146 with 112 unique birthdays. JOHN GUTTAG: 146 people, 112 unique birthdays.
+43:12
+So indeed, the probability does work.
+43:26
+So we know you're exceptional in a funny way. Well, you can imagine how hard it
+43:32
+would be to adjust the analytic model to account for a weird distribution of birthdates.
+43:40
+But again, adjusting the simulation model is easy. I could have gone back to that heat
+43:46
+map I showed you of birthdays in the US and gotten a separate probability for each day,
+43:52
+but I was too lazy. And instead, what I observed was that we had a few days,
+44:01
+like February 29, highly unlikely, and this band
+44:06
+in the middle of people who were conceived in the late fall and early winter.
+44:13
+So what I did is I duplicated some dates.
+44:19
+So the 58th day of the year, February 29, occurs only once.
+44:25
+The dates before that, I said, let's
+44:30
+pretend they occur four times. What only matters here is not how often they occur but the relative frequency.
+44:36
+And then the dates after that occur four times
+44:46
+except for the dates in that band, which is going to have occur yet more often.
+44:52
+So now-- and don't worry about the exact details here-- but what I'm doing is simply adjusting the simulation
+44:58
+to change the probability of each date getting chosen by same date.
+45:04
+And then I can run the simulation model. And, again, with a very small change to code,
+45:13
+I've modeled something that's mathematically enormously complex. I have no idea how to actually do this probability
+45:22
+mathematically. But the code is, as you can see, quite straightforward.
+45:33
+So let's go to that here.
+45:39
+So what I'm going to do is comment this one out
+45:45
+and uncomment this more complicated set of dates
+46:02
+and see what we get.
+46:14
+And again, it changes quite dramatically. You might remember, before it was around I think 0.6-something for 100, and now, it's 0.75.
+46:23
+So getting away from the notion that birthdays are uniformly distributed to saying some birthdays are
+46:28
+more common than others, again, dramatically changes the answer.
+46:34
+And we can easily look at that.
+46:43
+So that gets us to the big topic of simulation models.
+46:49
+It's a program that describes a computation that provides information about the possible behaviors of a system.
+46:57
+I say possible behaviors, because I'm particularly interested in stochastic systems.
+47:02
+They're descriptive not prescriptive in the sense
+47:10
+that they describe the possible outcomes. They don't tell you how to achieve possible outcomes.
+47:18
+This is different from what we've looked at earlier in the course, where we looked at optimization models.
+47:25
+So an optimization model is prescriptive. It tells you how to achieve an effect,
+47:33
+how to get the most value out of your knapsack, how to find the shortest path from A to B in a graph.
+47:42
+In contrast, a simulation model says, if I do this, here's what happens.
+47:48
+It doesn't tell you how to make something happened. So it's very different, and it's why
+47:53
+we need both, why we need optimization models and we need simulation models.
+48:00
+We have to remember that a simulation model is only an approximation to reality.
+48:06
+I put in an approximation to the distribution of birthdates, but it wasn't quite right.
+48:12
+And as the very famous statistician George Box said, "all models are wrong, but some are actually very useful."
+48:22
+In the next lecture, we'll look at a useful class of models.
+48:27
+When do we use simulations? Typically, as we've just shown, to model systems that
+48:33
+are mathematically intractable, like the birthday problem we just looked at.
+48:39
+In other situations, to extract intermediate results-- something happens along the way to the answer.
+48:47
+And as I hope you've seen that simulations are used because we can play what if games by successively
+48:55
+refining it. We started with a simple simulation that assumed that we only asked the question of, do
+49:01
+two people share a birthday. We showed how we could change it to ask do three people share
+49:08
+a birthday. We then saw that we could change it to assume a different distribution of birthdates
+49:16
+in the group. And so we can start with something simple. And we get it ever more complexed
+49:23
+to answer questions what if.
+49:29
+We're going to start in the next lecture by producing a simulation of a random walk.
+49:36
+And with that, I'll stop. And see you guys soon.

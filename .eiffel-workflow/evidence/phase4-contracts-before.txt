@@ -1,0 +1,45 @@
+src/measurement.e:15:        require
+src/measurement.e:21:        ensure
+src/measurement.e:32:        ensure
+src/measurement.e:47:        ensure
+src/measurement.e:70:invariant
+src/monte_carlo_experiment.e:15:        require
+src/monte_carlo_experiment.e:23:        ensure
+src/monte_carlo_experiment.e:33:        require
+src/monte_carlo_experiment.e:38:        ensure
+src/monte_carlo_experiment.e:44:        require
+src/monte_carlo_experiment.e:49:        ensure
+src/monte_carlo_experiment.e:57:        require
+src/monte_carlo_experiment.e:83:        ensure
+src/monte_carlo_experiment.e:93:        require
+src/monte_carlo_experiment.e:104:        ensure
+src/monte_carlo_experiment.e:111:        require
+src/monte_carlo_experiment.e:119:        ensure
+src/monte_carlo_experiment.e:128:        require
+src/monte_carlo_experiment.e:133:        ensure
+src/monte_carlo_experiment.e:141:        ensure
+src/monte_carlo_experiment.e:149:            -- Model query: count of outcomes (for invariants).
+src/monte_carlo_experiment.e:188:        require
+src/monte_carlo_experiment.e:193:        ensure
+src/monte_carlo_experiment.e:199:        require
+src/monte_carlo_experiment.e:206:        ensure
+src/monte_carlo_experiment.e:210:invariant
+src/simulation_statistics.e:18:        require
+src/simulation_statistics.e:37:        ensure
+src/simulation_statistics.e:51:        ensure
+src/simulation_statistics.e:59:        ensure
+src/simulation_statistics.e:81:        ensure
+src/simulation_statistics.e:90:        ensure
+src/simulation_statistics.e:98:        ensure
+src/simulation_statistics.e:104:        require
+src/simulation_statistics.e:112:        ensure
+src/simulation_statistics.e:129:invariant
+src/trial_logic_callable.e:13:        require
+src/trial_logic_callable.e:16:        ensure
+src/trial_outcome.e:17:        ensure
+src/trial_outcome.e:25:        require
+src/trial_outcome.e:33:        ensure
+src/trial_outcome.e:47:        ensure
+src/trial_outcome.e:62:        require
+src/trial_outcome.e:69:        ensure
+src/trial_outcome.e:83:invariant
