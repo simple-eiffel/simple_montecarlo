@@ -21,7 +21,7 @@
 
 		<!-- Library targets -->
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
-		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf"/>
+		<library name="simple_testing" location="$SIMPLE_EIFFEL\simple_testing\simple_testing.ecf"/>
 
 		<!-- Project source files -->
 		<cluster name="src" location="src" recursive="true">

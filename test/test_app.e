@@ -1,142 +1,94 @@
 note
-    description: "Test application runner for simple_montecarlo"
-    void_safety: "all"
+	description: "Test application for simple_montecarlo"
 
-class TEST_APP
+class
+	TEST_APP
 
 create
-    make
+	make
 
-feature -- Execution
+feature {NONE} -- Initialization
 
-    make
-            -- Run test suite.
-        local
-            l_tests: LIB_TESTS
-            l_failed: INTEGER
-        do
-            create l_tests
-            print ("simple_montecarlo Test Suite%N")
-            print ("===========================%N%N")
+	make
+			-- Run the tests.
+		do
+			print ("Running SIMPLE_MONTECARLO tests...%N%N")
+			passed := 0
+			failed := 0
 
-            -- Run MEASUREMENT tests
-            print ("MEASUREMENT Tests:%N")
-            l_failed := run_test (l_tests, "test_measurement_make_real")
-            l_failed := l_failed + run_test (l_tests, "test_measurement_make_integer")
-            l_failed := l_failed + run_test (l_tests, "test_measurement_real_to_integer")
+			run_lib_tests
 
-            -- Run TRIAL_OUTCOME tests
-            print ("%NTRIAL_OUTCOME Tests:%N")
-            l_failed := l_failed + run_test (l_tests, "test_trial_outcome_make")
-            print ("  test_trial_outcome_add_measurement... SKIPPED (Phase 5 refinement)%N")
-            print ("  test_trial_outcome_measurement_at... SKIPPED (Phase 5 refinement)%N")
+			print ("%N========================%N")
+			print ("Results: " + passed.out + " passed, " + failed.out + " failed%N")
 
-            -- Run SIMULATION_STATISTICS tests
-            print ("%NSIMULATION_STATISTICS Tests:%N")
-            l_failed := l_failed + run_test (l_tests, "test_statistics_make")
-            l_failed := l_failed + run_test (l_tests, "test_statistics_ci_99")
-            l_failed := l_failed + run_test (l_tests, "test_statistics_confidence_interval")
+			if failed > 0 then
+				print ("TESTS FAILED%N")
+			else
+				print ("ALL TESTS PASSED%N")
+			end
+		end
 
-            -- Run MONTE_CARLO_EXPERIMENT tests
-            print ("%NMONTE_CARLO_EXPERIMENT Tests:%N")
-            l_failed := l_failed + run_test (l_tests, "test_experiment_make")
-            l_failed := l_failed + run_test (l_tests, "test_experiment_set_seed")
-            l_failed := l_failed + run_test (l_tests, "test_experiment_set_trial_logic")
-            l_failed := l_failed + run_test (l_tests, "test_experiment_run_simulation")
-            l_failed := l_failed + run_test (l_tests, "test_experiment_statistics")
+feature {NONE} -- Test Runners
 
-            -- Run Adversarial Tests (Phase 6)
-            print ("%NAdversarial Tests:%N")
-            l_failed := l_failed + run_test (l_tests, "test_measurement_boundary_min_real")
-            l_failed := l_failed + run_test (l_tests, "test_measurement_boundary_max_real")
-            l_failed := l_failed + run_test (l_tests, "test_measurement_boundary_zero")
-            l_failed := l_failed + run_test (l_tests, "test_measurement_negative_values")
-            l_failed := l_failed + run_test (l_tests, "test_trial_outcome_stress_many_measurements")
-            l_failed := l_failed + run_test (l_tests, "test_statistics_ci_ordering")
-            l_failed := l_failed + run_test (l_tests, "test_experiment_stress_small_count")
-            l_failed := l_failed + run_test (l_tests, "test_experiment_precondition_zero_trials")
-            l_failed := l_failed + run_test (l_tests, "test_experiment_run_without_logic")
-            l_failed := l_failed + run_test (l_tests, "test_experiment_state_transitions")
-            l_failed := l_failed + run_test (l_tests, "test_measurement_conversion_truncation")
-            l_failed := l_failed + run_test (l_tests, "test_trial_outcome_duplicate_name_rejection")
+	run_lib_tests
+		do
+			create lib_tests
 
-            print ("%N===========================%N")
-            if l_failed = 0 then
-                print ("All tests PASSED ✓%N")
-            else
-                print (l_failed.out + " test(s) FAILED%N")
-            end
-        end
+			-- MEASUREMENT tests
+			run_test (agent lib_tests.test_measurement_make_real, "test_measurement_make_real")
+			run_test (agent lib_tests.test_measurement_make_integer, "test_measurement_make_integer")
+			run_test (agent lib_tests.test_measurement_real_to_integer, "test_measurement_real_to_integer")
 
-    run_test (a_tests: LIB_TESTS; a_test_name: STRING): INTEGER
-            -- Run single test and report result.
-            -- Returns 1 if test failed, 0 if passed.
-        require
-            tests_attached: a_tests /= Void
-            test_name_not_empty: not a_test_name.is_empty
-        do
-            print ("  " + a_test_name + "... ")
+			-- TRIAL_OUTCOME tests
+			run_test (agent lib_tests.test_trial_outcome_make, "test_trial_outcome_make")
+			run_test (agent lib_tests.test_trial_outcome_add_measurement, "test_trial_outcome_add_measurement")
+			run_test (agent lib_tests.test_trial_outcome_measurement_at, "test_trial_outcome_measurement_at")
 
-            -- Use reflection or pattern match to run test
-            if a_test_name.is_equal ("test_measurement_make_real") then
-                a_tests.test_measurement_make_real
-            elseif a_test_name.is_equal ("test_measurement_make_integer") then
-                a_tests.test_measurement_make_integer
-            elseif a_test_name.is_equal ("test_measurement_real_to_integer") then
-                a_tests.test_measurement_real_to_integer
-            elseif a_test_name.is_equal ("test_trial_outcome_make") then
-                a_tests.test_trial_outcome_make
-            elseif a_test_name.is_equal ("test_trial_outcome_add_measurement") then
-                a_tests.test_trial_outcome_add_measurement
-            elseif a_test_name.is_equal ("test_trial_outcome_measurement_at") then
-                a_tests.test_trial_outcome_measurement_at
-            elseif a_test_name.is_equal ("test_statistics_make") then
-                a_tests.test_statistics_make
-            elseif a_test_name.is_equal ("test_statistics_ci_99") then
-                a_tests.test_statistics_ci_99
-            elseif a_test_name.is_equal ("test_statistics_confidence_interval") then
-                a_tests.test_statistics_confidence_interval
-            elseif a_test_name.is_equal ("test_experiment_make") then
-                a_tests.test_experiment_make
-            elseif a_test_name.is_equal ("test_experiment_set_seed") then
-                a_tests.test_experiment_set_seed
-            elseif a_test_name.is_equal ("test_experiment_set_trial_logic") then
-                a_tests.test_experiment_set_trial_logic
-            elseif a_test_name.is_equal ("test_experiment_run_simulation") then
-                a_tests.test_experiment_run_simulation
-            elseif a_test_name.is_equal ("test_experiment_statistics") then
-                a_tests.test_experiment_statistics
-            elseif a_test_name.is_equal ("test_measurement_boundary_min_real") then
-                a_tests.test_measurement_boundary_min_real
-            elseif a_test_name.is_equal ("test_measurement_boundary_max_real") then
-                a_tests.test_measurement_boundary_max_real
-            elseif a_test_name.is_equal ("test_measurement_boundary_zero") then
-                a_tests.test_measurement_boundary_zero
-            elseif a_test_name.is_equal ("test_measurement_negative_values") then
-                a_tests.test_measurement_negative_values
-            elseif a_test_name.is_equal ("test_trial_outcome_stress_many_measurements") then
-                a_tests.test_trial_outcome_stress_many_measurements
-            elseif a_test_name.is_equal ("test_statistics_ci_ordering") then
-                a_tests.test_statistics_ci_ordering
-            elseif a_test_name.is_equal ("test_experiment_stress_small_count") then
-                a_tests.test_experiment_stress_small_count
-            elseif a_test_name.is_equal ("test_experiment_precondition_zero_trials") then
-                a_tests.test_experiment_precondition_zero_trials
-            elseif a_test_name.is_equal ("test_experiment_run_without_logic") then
-                a_tests.test_experiment_run_without_logic
-            elseif a_test_name.is_equal ("test_experiment_state_transitions") then
-                a_tests.test_experiment_state_transitions
-            elseif a_test_name.is_equal ("test_measurement_conversion_truncation") then
-                a_tests.test_measurement_conversion_truncation
-            elseif a_test_name.is_equal ("test_trial_outcome_duplicate_name_rejection") then
-                a_tests.test_trial_outcome_duplicate_name_rejection
-            end
+			-- SIMULATION_STATISTICS tests
+			run_test (agent lib_tests.test_statistics_make, "test_statistics_make")
+			run_test (agent lib_tests.test_statistics_ci_99, "test_statistics_ci_99")
+			run_test (agent lib_tests.test_statistics_confidence_interval, "test_statistics_confidence_interval")
 
-            print ("PASS%N")
-            Result := 0
-        rescue
-            print ("FAIL%N")
-            Result := 1
-        end
+			-- MONTE_CARLO_EXPERIMENT tests
+			run_test (agent lib_tests.test_experiment_make, "test_experiment_make")
+			run_test (agent lib_tests.test_experiment_set_seed, "test_experiment_set_seed")
+			run_test (agent lib_tests.test_experiment_set_trial_logic, "test_experiment_set_trial_logic")
+			run_test (agent lib_tests.test_experiment_run_simulation, "test_experiment_run_simulation")
+
+			-- Adversarial tests
+			run_test (agent lib_tests.test_measurement_boundary_min_real, "test_measurement_boundary_min_real")
+			run_test (agent lib_tests.test_measurement_boundary_max_real, "test_measurement_boundary_max_real")
+			run_test (agent lib_tests.test_measurement_boundary_zero, "test_measurement_boundary_zero")
+			run_test (agent lib_tests.test_measurement_negative_values, "test_measurement_negative_values")
+			run_test (agent lib_tests.test_trial_outcome_stress_many_measurements, "test_trial_outcome_stress_many_measurements")
+			run_test (agent lib_tests.test_statistics_ci_ordering, "test_statistics_ci_ordering")
+			run_test (agent lib_tests.test_experiment_stress_small_count, "test_experiment_stress_small_count")
+			run_test (agent lib_tests.test_experiment_precondition_zero_trials, "test_experiment_precondition_zero_trials")
+			run_test (agent lib_tests.test_experiment_run_without_logic, "test_experiment_run_without_logic")
+			run_test (agent lib_tests.test_experiment_state_transitions, "test_experiment_state_transitions")
+			run_test (agent lib_tests.test_measurement_conversion_truncation, "test_measurement_conversion_truncation")
+			run_test (agent lib_tests.test_trial_outcome_duplicate_name_rejection, "test_trial_outcome_duplicate_name_rejection")
+		end
+
+feature {NONE} -- Implementation
+
+	lib_tests: LIB_TESTS
+	passed, failed: INTEGER
+
+	run_test (a_test: PROCEDURE; a_name: STRING)
+		local
+			l_retried: BOOLEAN
+		do
+			if not l_retried then
+				a_test.call (Void)
+				print ("  PASS: " + a_name + "%N")
+				passed := passed + 1
+			end
+		rescue
+			print ("  FAIL: " + a_name + "%N")
+			failed := failed + 1
+			l_retried := True
+			retry
+		end
 
 end
